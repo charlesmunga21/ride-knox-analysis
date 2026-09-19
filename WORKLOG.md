@@ -202,6 +202,7 @@ TODO 7c. (i) Allcommits appear in the history, (ii) report.md and charts/ are vi
 
 Q7. git push -u origin main: origin is the name for GitHub copy we are creating from our local repo and u stands for universal in that we can push any local changes inside our repositories directly to our online GitHub repository.
 
+TODO 8b. Recovery test performed on Sept 18 2026.
 
 
 
