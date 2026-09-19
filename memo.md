@@ -36,6 +36,8 @@ members.
 
 A 2 minute trip is not realistic even though used as the cutoff threshold.
 
+Trips over 24 hours were considered abnormal and thus, excluded.
+
 A Day Pass buys unlimited rides so 10,886 day-pass trips are fewer than 10,886
 customers. Without user IDs, the recovery figure is just the upper bound.
 
