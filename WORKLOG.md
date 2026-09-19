@@ -226,6 +226,18 @@ ccc21da Added code netbook and corresponding charts showing ridership trend
 e3ebe1f Add report answering manager question on whether ridership is down```
 
 TODO 8b.
+```To https://github.com/charlesmunga21/ride-knox-analysis.git
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'https://github.com/charlesmunga21/ride-knox-analysis.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.```
+
+TODO 8c. Line still missing
+
+Q8: Version control part: one can easily monitor changes across time, send it to the GitHub account and pull whenever and from wherever. The protection holds if commits are actually made often.
 
 
 ## Reflection + AI disclosure (in WORKLOG.md)
