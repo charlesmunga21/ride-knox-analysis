@@ -133,12 +133,49 @@ TODO 5d.
 	Fast-forward
  	memo.md | 2 +-
  	1 file changed, 1 insertion(+), 1 deletion(-)```
+
 Q5b. Fast forward message here shows that since there was no other commit or change in main branch(master didn't move) since we started working on min-cutoff-2min branch, merge simply matches and connects last main branch label to corresponding label in the new branch to form one continuous line.
 
 TODO 5e.
 ```$ git branch
 	* master```
 
+## Part 6
+
+TODO 6c. 
+```Auto-merging memo.md
+CONFLICT (content): Merge conflict in memo.md
+Automatic merge failed; fix conflicts and then commit the result.```
+
+```<<<<<<< HEAD
+Trips over 24 hours were excluded since bikes likely never docked.
+=======
+Abnormal trips that lasted more than 24 hours were excluded.
+>>>>>>> reword-limitations```
+
+Q6a. The wording committed on main. This is because merge action was initiated while on main branch.
+
+TODO 6d.
+```2b3a50a (HEAD -> master) Resolved max duration conflict by 	keeping main branch wording
+b711a56 Updated max duration in memo on main branch
+cf8e644 (reword-limitations) Updated maximum duration 	wording in memo
+b880872 Added the 24 -hour max limitation
+1e20257 Updated main branch with new min-duration using 	merge
+d1efcd8 Fixed minimum trip duration from 1 to 2 minutes
+f152051 Added the 1 minute cutoff limitation in report to 	fit question
+339d78c Fixed exaggerated claim in part 4 using revert & 	stated why
+540504f Revert "Add exaggerated claim (on purpose, for Part 	4)"
+d2247e6 Add exaggerated claim (on purpose, for Part 4)
+f4115fd tested the function of restore unstaging in WORKLOG
+9326fc0 Fixed wrongfully staged analysis file
+fa49493 fixed paragraph deletion from the memo by restoring 	original file
+38fe329 Reword trips affected by January app bug
+3ff306c Add gitignore to exclude large raw data files and 	temporary files
+3f23ef3 Added the tracking document for this repo
+ccc21da Added code netbook and corresponding charts showing 	ridership trend
+e3ebe1f Add report answering manager question on whether 	ridership is down```
+
+Q6b. "A merge conflict is not Git failing; it is Git _refusing to guess between two/more decisions made on the same component of a given problem____."
 
 
 
@@ -149,11 +186,6 @@ TODO 5e.
 
 
 
-
-
-
-
-## Part 5
 ## Part 6
 ## Part 7
 ## Part 8
