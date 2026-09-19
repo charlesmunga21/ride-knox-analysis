@@ -177,17 +177,37 @@ e3ebe1f Add report answering manager question on whether 	ridership is down```
 
 Q6b. "A merge conflict is not Git failing; it is Git _refusing to guess between two/more decisions made on the same component of a given problem____."
 
-
-
-
-
-
-
-
-
-
-## Part 6
 ## Part 7
+
+TODO 7b. 
+```$  git remote add origin https://github.com/charlesmunga21/ride-knox-analysis.git
+git remote add origin https://github.com/ride-knox-analysis/ride-knox-analysis.git
+git push -u origin master
+
+error: remote origin already exists.
+error: remote origin already exists.
+
+Enumerating objects: 63, done.
+Counting objects: 100% (63/63), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (61/61), done.
+Writing objects: 100% (63/63), 760.07 KiB | 6.55 MiB/s, done.
+Total 63 (delta 30), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (30/30), done.
+To https://github.com/charlesmunga21/ride-knox-analysis.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'origin/master'.``` 
+
+TODO 7c. (i) Allcommits appear in the history, (ii) report.md and charts/ are visible, and (iii) trips_2025.csv, stations.xlsx, and scratch/ are not there (PNG uploaded).
+
+Q7. git push -u origin main: origin is the name for GitHub copy we are creating from our local repo and u stands for universal in that we can push any local changes inside our repositories directly to our online GitHub repository.
+
+
+
+
+
+
+
 ## Part 8
 ## Reflection + AI disclosure (in WORKLOG.md)
 ## Part 9: Challenge (optional)
