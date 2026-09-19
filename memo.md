@@ -34,6 +34,8 @@ members.
 
 #### Limitations
 
+A 1 minute trip is not realistic even though used as the cutoff threshold.
+
 A Day Pass buys unlimited rides so 10,886 day-pass trips are fewer than 10,886
 customers. Without user IDs, the recovery figure is just the upper bound.
 
