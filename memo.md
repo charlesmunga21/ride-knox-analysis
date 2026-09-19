@@ -34,7 +34,7 @@ members.
 
 #### Limitations
 
-A 2 minute trip is not realistic even though used as the cutoff threshold.
+A 2 minute trip is not realistic even though used as the cutoff threshold in this report.
 
 Trips over 24 hours were excluded since bikes likely never docked.
 A Day Pass buys unlimited rides so 10,886 day-pass trips are fewer than 10,886
