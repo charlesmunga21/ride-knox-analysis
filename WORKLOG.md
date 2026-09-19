@@ -226,7 +226,6 @@ ccc21da Added code netbook and corresponding charts showing ridership trend
 e3ebe1f Add report answering manager question on whether ridership is down```
 
 TODO 8b.
-Recovery test performed on Sept 18 2026.
 
 
 ## Reflection + AI disclosure (in WORKLOG.md)
