@@ -101,7 +101,10 @@ no changes added to commit (use "git add" and/or "git commit -a")```
  
 TODO 4b.
 This requires me to edit WORKLOG file and stage together with analysis file which I haven't changed. This is my edit.
-
+```On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   WORKLOG.md```
 
 
 ## Part 5
