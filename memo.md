@@ -32,8 +32,6 @@ but not as members switching down because member ridership increases by 9.9% for
 61.3% of day-pass trips fall at weekends against 28.9% for
 members.
 
-Member trips are 80% higher on weekends than weekdays.
-
 #### Limitations
 
 A Day Pass buys unlimited rides so 10,886 day-pass trips are fewer than 10,886
