@@ -198,16 +198,36 @@ To https://github.com/charlesmunga21/ride-knox-analysis.git
  * [new branch]      master -> master
 branch 'master' set up to track 'origin/master'.``` 
 
-TODO 7c. (i) Allcommits appear in the history, (ii) report.md and charts/ are visible, and (iii) trips_2025.csv, stations.xlsx, and scratch/ are not there (PNG uploaded).
+TODO 7c. (i) All commits appear in the history, (ii) report.md and charts/ are visible, and (iii) trips_2025.csv, stations.xlsx, and scratch/ are not there (PNG uploaded).
 
 Q7. git push -u origin main: origin is the name for GitHub copy we are creating from our local repo and u stands for universal in that we can push any local changes inside our repositories directly to our online GitHub repository.
 
-
-
-
-
-
-
 ## Part 8
+TODO 8a.
+```3cafbf0 (HEAD -> master, origin/master, origin/HEAD) Updated worklog history after git push execution
+e7fb35e Created a change in memo max durations in two branches and fixed the conflict
+2b3a50a Resolved max duration conflict by keeping main branch wording
+b711a56 Updated max duration in memo on main branch
+cf8e644 Updated maximum duration wording in memo
+b880872 Added the 24 -hour max limitation
+1e20257 Updated main branch with new min-duration using merge
+d1efcd8 Fixed minimum trip duration from 1 to 2 minutes
+f152051 Added the 1 minute cutoff limitation in report to fit question
+339d78c Fixed exaggerated claim in part 4 using revert & stated why
+540504f Revert "Add exaggerated claim (on purpose, for Part 4)"
+d2247e6 Add exaggerated claim (on purpose, for Part 4)
+f4115fd tested the function of restore unstaging in WORKLOG
+9326fc0 Fixed wrongfully staged analysis file
+fa49493 fixed paragraph deletion from the memo by restoring original file
+38fe329 Reword trips affected by January app bug
+3ff306c Add gitignore to exclude large raw data files and temporary files
+3f23ef3 Added the tracking document for this repo
+ccc21da Added code netbook and corresponding charts showing ridership trend
+e3ebe1f Add report answering manager question on whether ridership is down```
+
+TODO 8b.
+Recovery test performed on Sept 18 2026.
+
+
 ## Reflection + AI disclosure (in WORKLOG.md)
 ## Part 9: Challenge (optional)
