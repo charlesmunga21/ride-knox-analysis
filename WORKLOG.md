@@ -105,6 +105,36 @@ This requires me to edit WORKLOG file and stage together with analysis file whic
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
         modified:   WORKLOG.md```
+TODO 4c.
+```540504f (HEAD -> master) Revert "Add exaggerated claim (on purpose, for Part 4)"
+d2247e6 Add exaggerated claim (on purpose, for Part 4)
+f4115fd tested the function of restore unstaging in WORKLOG
+9326fc0 Fixed wrongfully staged analysis file
+fa49493 fixed paragraph deletion from the memo by restoring original file
+38fe329 Reword trips affected by January app bug
+3ff306c Add gitignore to exclude large raw data files and temporary files
+3f23ef3 Added the tracking document for this repo
+ccc21da Added code netbook and corresponding charts showing ridership trend
+e3ebe1f Add report answering manager question on whether ridership is down```
+
+Q4. The mistake and its fix are part of the story just as we left a cell audit trail in week 3 while working with codes. The commit after the fix is intentional, to make sure that anybody who comes across the repo understands how a mistake occurred and was fixed, instead of a deletion(lost trail). 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Part 5
