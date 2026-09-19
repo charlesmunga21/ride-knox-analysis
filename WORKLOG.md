@@ -239,6 +239,41 @@ TODO 8c. Line still missing
 
 Q8: Version control part: one can easily monitor changes across time, send it to the GitHub account and pull whenever and from wherever. The protection holds if commits are actually made often.
 
+## Part 9: Challenge (optional)
+```$ git log --oneline --graph --all
+* 82ba326 (HEAD -> master) The same 2 min line changed on master branch to test divergence  [1. this is the master branch]
+| * c55d0b1 (draw-divergence) Changed 2 minute trip limitations wording
+| * 7e3ed0b Revert "Deleted first and middle name in the header section"    [2. this is the draw-divergence branch]
+| * 7af02bb Deleted first and middle name in the header section
+|/          [3. this is where the two branches diverge]
+* 79cb3b7 (origin/master, origin/HEAD) Added screenshot evidence that will be attached with assignment
+* 73d8454 fixed commit error for the 1 to  2 min changes in notebook cleaning cell
+* 04832f3 Added comment on how git and github secure work
+*   7d6f56f Keep local WORKLOG and finish pull
+|\  
+| *   706938d Resolve WORKLOG merge and keep local history
+| |\  
+| * | 83c2f09 Updates before git pull is executed
+* | | 85abb71 Updated the date to indicate when recovery test occurred
+| |/  
+|/|   
+* | 706f9b9 Tested cloning to see how push responds after commit in worklog
+|/  
+* 3cafbf0 Updated worklog history after git push execution
+* e7fb35e Created a change in memo max durations in two branches and fixed the conflict
+*   2b3a50a Resolved max duration conflict by keeping main branch wording
+|\  
+| * cf8e644 Updated maximum duration wording in memo
+* | b711a56 Updated max duration in memo on main branch
+|/  
+* b880872 Added the 24 -hour max limitation
+* 1e20257 Updated main branch with new min-duration using merge
+* d1efcd8 Fixed minimum trip duration from 1 to 2 minutes
+* f152051 Added the 1 minute cutoff limitation in report to fit question
+* 339d78c Fixed exaggerated claim in part 4 using revert & stated why
+* 540504f Revert "Add exaggerated claim (on purpose, for Part 4)"
+* d2247e6 Add exaggerated claim (on purpose, for Part 4)```
+
+Q9. The commit that git will not allow fast-forward merge is the one we just completed on changing the min duration in memo on both branches. This is because the master branch moves, and last commit since the branching occurred now shifts.
 
 ## Reflection + AI disclosure (in WORKLOG.md)
-## Part 9: Challenge (optional)
