@@ -119,9 +119,25 @@ e3ebe1f Add report answering manager question on whether ridership is down```
 
 Q4. The mistake and its fix are part of the story just as we left a cell audit trail in week 3 while working with codes. The commit after the fix is intentional, to make sure that anybody who comes across the repo understands how a mistake occurred and was fixed, instead of a deletion(lost trail). 
 
+## Part 5
 
+TODO 5a.
+```  master
+* min-cutoff-2min```
 
+Q5a.
+One commit is appropriate at this point because changes affect the same component, minimum duration threshold in both analysis and memo files.
 
+TODO 5d.
+```Updating f152051..d1efcd8
+	Fast-forward
+ 	memo.md | 2 +-
+ 	1 file changed, 1 insertion(+), 1 deletion(-)```
+Q5b. Fast forward message here shows that since there was no other commit or change in main branch(master didn't move) since we started working on min-cutoff-2min branch, merge simply matches and connects last main branch label to corresponding label in the new branch to form one continuous line.
+
+TODO 5e.
+```$ git branch
+	* master```
 
 
 
