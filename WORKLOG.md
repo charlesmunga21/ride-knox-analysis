@@ -274,6 +274,23 @@ Q8: Version control part: one can easily monitor changes across time, send it to
 * 540504f Revert "Add exaggerated claim (on purpose, for Part 4)"
 * d2247e6 Add exaggerated claim (on purpose, for Part 4)```
 
-Q9. The commit that git will not allow fast-forward merge is the one we just completed on changing the min duration in memo on both branches. This is because the master branch moves, and last commit since the branching occurred now shifts.
+Q9. The commit that git will not allow fast-forward merge is the one we just completed on changing the min duration in memo on both master and draw-divergence branches. This is because the master branch moves, and last commit since the branching occurred now shifts.
 
 ## Reflection + AI disclosure (in WORKLOG.md)
+
+R1.Part 6 "Oops" felt so real and practical. While a merge here is part of my assignment, it might mean a collaboration in another context, and changes without correct commit message will definitely aggravate such situations. 
+Additionally, I had so many problems with the cloning section: first, I cloned the repo into Desktop directory, made changes and successfully pushed. However, since I was still noting down such changes in my WORKLOG.md in original folder, the pull broke. I had to rebase my GitHub repo to match my local repo (True assignment) then pushed the updated version. How would I have handled that differently?
+
+R2. I used AI mostly for troubleshooting whenever a familiar command returned ERROR. Additionally, in question 8 after cloning and attempting to pull from origin/master, I got an error and had to use AI to find a better command 'rebase' that could combine with the ones covered in class to maintain the work intact. All final commands, commits and conclusions are my own work.
+
+
+
+
+
+
+
+
+
+
+
+
