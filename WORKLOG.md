@@ -100,7 +100,7 @@ no changes added to commit (use "git add" and/or "git commit -a")```
 ```Command : git restore memo.md```
  
 TODO 4b.
-
+This requires me to edit WORKLOG file and stage together with analysis file which I haven't changed. This is my edit.
 
 
 
