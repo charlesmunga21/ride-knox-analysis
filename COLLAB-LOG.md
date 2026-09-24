@@ -42,4 +42,34 @@ fa49493 fixed paragraph deletion from the memo by restoring original file
 ccc21da Added code netbook and corresponding charts showing ridership trend
 e3ebe1f Add report answering manager question on whether ridership is down.```
 
-## Part 1
+Q0.
+The repo still can't explain itself, and nobody outside GitHub can see it.
+
+## Part 1: Issues, The Shared To-Do List
+TODO 1a. 
+Issue #1 URL: https://github.com/charlesmunga21/ride-knox-analysis/issues/1 
+
+TODO 1b.
+Issue #2:https://github.com/charlesmunga21/ride-knox-analysis/issues/2
+
+### What / where
+3774 of 247,967 trips have no end-station_id, do we drop or flag and keep?
+### Expected vs. actual
+Expected: 0 rows where end_station_id == 0.
+Actual: 3773 rows.
+### Why it matters
+These trips potentially indicate bikes that were never docked
+
+Issue #3:https://github.com/charlesmunga21/ride-knox-analysis/issues/3
+
+### What / where
+Some trips have negative duration whereby end_time comes before start_time
+### Expected vs. actual
+Expected: (end_time) - (start_time) == +ve integer values for 247967 rows.
+Actual: (end_time) - (start_time) == -ve integer value for 747 rows.
+### Why it matters
+They deflate duration estimations and corrupt final interpretation.
+
+TODO 1C.
+Took screenshot of @charlesmunga21#1 in issue #2 which simply references the README at the question regarding 3773 missing end stations.
+
