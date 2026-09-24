@@ -89,7 +89,26 @@ TODO 2b. On that branch, make one small, genuine improvement to report.md; for e
 ```sentence: Raw data files live outside the Github repo```
 
 TODO 2c. Stage, commit (a message that says why), and push the branch with the upstream link set. Then on GitHub open a pull request into main. In the PR description, explain the change in one or two sentences; if it resolves one of your Part 1 issues, add Closes #N. Paste the commit message and the PR description.
+```created a branch that will be used to execute pull request on GitHub```
+```This branch updated the memo.md to highlight that the raw data files are not contained within the repo. Users 	must inquire about those files from the repo owner```
 
+TODO 2d. Self-review: on the PR's "Files changed" tab, leave at least one line comment on your own diff (e.g., noting why you reworded it), then merge the pull request. Paste a screenshot of the line comment.
+
+```The rewording ensures that future users consistently remember not to scramble through this repo looking for the raw data. This will also be addressed in issue #1```
+
+TODO 2e. Locally, git switch main and git pull, then paste git log --oneline showing the merge landed on main.
+
+``` git log --oneline
+a66800d (HEAD -> master, origin/master, origin/HEAD) Merge pull request #4 from charlesmunga21/chore/tidy-report
+69b1041 (origin/chore/tidy-report, chore/tidy-report) Updated COLLAB-LOG before starting PR
+3892b6a created a branch that will be used to execute pull request on GitHub
+7711b63 Added a message in the memo recommendation indicating that raw files are not on the repo
+588d215 Created 3 issues on GitHub and referenced them
+361b324 Added a png of the cross_link referencing README at missing end_stations
+3859a99 Added COLLAB-LOG markdown that will track all code outputs and answers to assignment questions```
+
+Q2: At the moment your PR was open but not yet merged, what was true of main? Answer in one sentence.
+Main/master was static and untouched since no changes had occurred there.
 
 
 
