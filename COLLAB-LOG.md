@@ -73,3 +73,9 @@ They deflate duration estimations and corrupt final interpretation.
 TODO 1C.
 Took screenshot of @charlesmunga21#1 in issue #2 which simply references the README at the question regarding 3773 missing end stations.
 
+Q1: 
+### Expected vs. actual
+Expected: (end_time) - (start_time) == +ve integer values for 247967 rows.
+Actual: (end_time) - (start_time) == -ve integer values for 747 rows.
+
+
