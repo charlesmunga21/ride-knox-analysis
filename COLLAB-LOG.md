@@ -78,4 +78,27 @@ Q1:
 Expected: (end_time) - (start_time) == +ve integer values for 247967 rows.
 Actual: (end_time) - (start_time) == -ve integer values for 747 rows.
 
+Part 2: A Pull Request, End to End
+
+TODO 2a.Create and switch to a branch named chore/tidy-report in one command. Paste the output of git branch showing where you are.
+
+```* chore/tidy-report
+  	master```
+
+TODO 2b. On that branch, make one small, genuine improvement to report.md; for example, tighten the sentence about station capacity pressure (the trips-per-dock finding), or add one sentence noting that the raw data lives outside the repo. Keep it to one logical change.
+```sentence: Raw data files live outside the Github repo```
+
+TODO 2c. Stage, commit (a message that says why), and push the branch with the upstream link set. Then on GitHub open a pull request into main. In the PR description, explain the change in one or two sentences; if it resolves one of your Part 1 issues, add Closes #N. Paste the commit message and the PR description.
+
+
+
+
+
+
+
+
+
+
+
+
 
