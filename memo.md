@@ -50,4 +50,5 @@ counting and excluded them from duration operation.
 Keep Day Pass and check after December. Relocate Sequoyah Hills Park's 10 docks to
 the Fort Sanders. Keep Bearden under review for next two years. Ask vendor to
 expose pass ID so day-pass customers can be counted, not just trips.
+Raw data files live outside the Github repo
 
