@@ -110,9 +110,28 @@ a66800d (HEAD -> master, origin/master, origin/HEAD) Merge pull request #4 from 
 Q2: At the moment your PR was open but not yet merged, what was true of main? Answer in one sentence.
 Main/master was static and untouched since no changes had occurred there.
 
+Part 3: Write the Project README
+TODO 3a. Create and switch to a branch named docs/project-readme
+```$ git branch
+  chore/tidy-report
+* docs/project-readme
+  master```
 
+TODO 3b. Create README.md with all of the following sections:
 
+	•Title + one-line description.
+	•Overview: the manager's two questions (ridership decline and where to add stations), in your own words.
+	•Data: a schema table for trips_2025.csv and a second schema table for stations.xlsx (the stations table 	was notshown in class — document its real columns: station_id, station_name, neighborhood, latitude, 	longitude, docks, year_installed). State clearly that the raw files are not in the repo and how to obtain 	them.
+	•How to run: the reproducibility steps (install requirements, open analysis.ipynb, Restart & Run All).
+	•Key findings: you must cite the station capacity / trips-per-dock story (busy campus stations vs. near-	idle Bearden and Sequoyah Hills) and embed your station bar chart with a relative path. (The class example 	embedded the monthly rider-type line chart; embed the station chart instead, using its real filename in 	charts/.)
+	•Limitations: the same honest caveats as report.md (one year of data; observational; documented cutoffs).
+	•Repo structure: a short file map.
 
+TODO 3c. Also on this branch, reword the bottom-line headline sentence of memo.md to your preferred wording (you'll need this in Part 4). Commit README.md and the report.md edit together on the branch. Do not open a PR yet.
+
+Q3: The class README embedded charts/monthly_by_rider_type.png. Which chart did you embed instead, and why does a relative path (rather than a path on your laptop) matter for someone who clones the repo?
+-I embedded two charts, one showing docks with highest arrivals and another of docks with lowest arrivals in 2025 to asses where resources are scarce and where a cut might be useful due to underutilization. 
+-A relative path is accessible to anybody who clones the repo as opposed to a path on my laptop which is only accessible locally to me (the user).
 
 
 
