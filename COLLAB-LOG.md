@@ -163,6 +163,20 @@ Q4: You resolved a conflict inside a pull request this time, versus the purely l
 
 -A conflict inside a pull request added an extra level of permanent searchable audit trail for anyone else who ever comes across this repository
 
+Part 5: Publish with GitHub Pages (12 pts)
+
+Turn the repo into a website a non-coder can read; with a different theme than the class used.
+
+TODO 5a. On a branch named chore/enable-pages, add a _config.yml in the repo root that selects the built-in theme jekyll-theme-cayman (not the class's jekyll-theme-minimal) and sets your own title and description. Commit, open a PR, and merge it (documentation ships through a PR, too). Paste your _config.yml.
+
+TODO 5b. Enable Pages: Settings → Pages → Source: main branch → /(root). Wait about a minute, then paste your live URL https://YOURUSERNAME.github.io/ride-knox-analysis/ and confirm in the worklog that (i) your README renders as the home page and (ii) the chart you embedded in Part 3 loads on the live site.
+
+TODO 5c. (Combines publishing with repo hygiene.) Add your live Pages URL to the repo's "About" sidebar (the gear/"Edit repo details" on the repo home page → Website field). Paste a screenshot of the sidebar showing the link.
+
+Q5: You used a different supported theme than the class; name it. If your embedded chart appeared as a broken image on the live site, what is the most likely cause, and how would you check?
+
+Theme used is jekyll-theme-slate. Image rendering failure could be attributed to unstaged or uncommited charts, or a wrong relative path. Perhaps using git status command or opening the ride-knox-analysis charts folder could help trouble shoot the issue further.
+
 
 
 
