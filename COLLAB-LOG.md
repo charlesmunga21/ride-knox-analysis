@@ -133,6 +133,35 @@ Q3: The class README embedded charts/monthly_by_rider_type.png. Which chart did 
 -I embedded two charts, one showing docks with highest arrivals and another of docks with lowest arrivals in 2025 to asses where resources are scarce and where a cut might be useful due to underutilization. 
 -A relative path is accessible to anybody who clones the repo as opposed to a path on my laptop which is only accessible locally to me (the user).
 
+Part 4: Merge the README Through a Conflict (14 pts)
+**(Combines a Module 5 skill (resolving a merge conflict) with a Module 6 skill (pull requests) in a way we did not do in class.)You are about to make main and your README branch disagree about the same line, then resolve it inside a PR.**
+
+TODO 4a. Switch to main. Reword that same bottom-line headline sentence of report.md differently from the version on your branch. Commit it on main. (Now both timelines have edited the same line; a conflict is guaranteed.)
+TODO 4b. Open a pull request from docs/project-readme into main, with Closes #<your README issue number> in the description. GitHub will show a "This branch has conflicts that must be resolved" banner; paste that banner (screenshot or text).
+``` This branch has conflicts that must be resolved
+Use the web editor or the command line to resolve conflicts before continuing.
+•	memo.md ````
+TODO 4c. Resolve the conflict. Locally: git switch docs/project-readme, git merge main, edit report.md to your final wording, delete all <<<<<<< / ======= / >>>>>>> markers, commit, and push — the PR updates automatically. Paste (i) the conflicted section including all three markers and (ii) your resolved sentence.
+``` <<<<<<< HEAD
+Non-member ridership went back to roughly its 2025 level due to the Day Pass, and it is
+=======
+The Day Pass restored non-member ridership back to roughly its 2025 level, and it is
+>>>>>>> master```
+
+``` Non-member ridership went back to roughly its 2025 level due to the Day Pass, and it is```
+
+TODO 4d. Merge the pull request on GitHub. Confirm in the worklog that the README issue auto-closed (thanks to Closes #N). Then git switch main && git pull and paste git log --oneline showing the merge commit.
+
+``` git log --oneline -n 5
+241598b (HEAD -> master, origin/master, origin/HEAD) Merge pull request #5 from charlesmunga21/docs/project-readme
+f88c674 (origin/docs/project-readme, docs/project-readme) Resolved the merge conflictin the bottom-line section of the memo
+74902dc Fixed the wording on the same bottom-line sentence in memo
+9570f6e Added charts, reworded bottom-line in memo, and added a README file
+6e5825d Created the repository README markdown file```
+
+Q4: You resolved a conflict inside a pull request this time, versus the purely local conflict you resolved in Module 5. Name one thing the PR added to the experience that a bare local git merge did not.
+
+-A conflict inside a pull request added an extra level of permanent searchable audit trail for anyone else who ever comes across this repository
 
 
 
