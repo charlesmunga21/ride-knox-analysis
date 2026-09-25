@@ -7,7 +7,7 @@
 
 #### Bottom line
 
-The Day Pass has brought non-member ridership back to roughly its 2025 level, and it is
+The Day Pass restored non-member ridership back to roughly its 2025 level, and it is
 attracting weekend leisure riders rather than converting members. Both campus capacity
 changes worked. One 2025 station should be moved.
 
