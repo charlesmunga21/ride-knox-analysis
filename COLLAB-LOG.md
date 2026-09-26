@@ -180,6 +180,7 @@ Theme used is jekyll-theme-slate. Image rendering failure could be attributed to
 Part 6: Peer Review
 
 TODO 6b-alt. Push to your fork and open a cross-repo pull request back to the original repo. In the PR, leave one line comment explaining your change. Paste the PR URL.
+https://github.com/DATA501/ride-knox-analysis/pull/1/commits/323c4c98423d74a929ff20b071dc744e1ef868af   
 
 Q6: In your own words: why does "Request changes" on a pull request tend to sting less than the same feedback delivered verbally in a meeting?
 This is because request changes on a pull request separates the code from the coder, while in a meeting, the coder is addressed directly and not his work. It feels more personal in a meeting.
@@ -188,7 +189,7 @@ Part 7: Portfolio Polish
 
 Make the repo yours and findable.
 TODO 7a. Create (or update) your profile README, the repo named exactly after your GitHub username, with a one-paragraph "who I am + best work" intro and a short tools line (e.g., Python · pandas · Git · GitHub Pages). Paste the profilegti README URL.
-https://github.com/charlesmunga21/charlesmunga21/blob/main/README.md 
+https://github.com/charlesmunga21/charlesmunga21/blob/main/README.md  
 
 TODO 7b. Pin ride-knox-analysis to your GitHub profile. Paste a screenshot of the pinned repo.
 Attached and committed.
@@ -200,6 +201,15 @@ Q7: A hiring manager has 60 seconds and 40 open repo tabs. Name two concrete thi
 -A real README that leads with key findings
 -Clickable github.io link to the repositpory so they don’t have to comb through codes & docs.
 
+Reflection + AI Disclosure (5 pts) - answer in COLLAB-LOG.md
+
+R1. Which was more nerve-wracking the first time; resolving the conflict inside a pull request (Part 4) or leaving a review on another person's code (Part 6)? Say why, in 2–3 sentences.
+Leaving a review on another person's code: The same way that a person sat down to write their code, is the same way that I sit with it for review. Under such circumstances, I have to be very careful to review the code objectively and leave out any subjective review of the coder. That way, a fix in the README sounds more of a clarity note to the team as opposed to a competition between two parties working on the same/related task.
+
+R2. AI disclosure: All commands used in this assignment are borrowed from the class modules and AI was used to clarify steps in the GitHub live Pages creation workflow.
+All final commits, PRs, reviews, and conclusions are my own.
+
+Last git status says the working tree is clean, and one last git push says everything is up to date.
 
 
 
