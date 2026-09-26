@@ -3,6 +3,19 @@
 ## Overview
 Which rider group, (`member` vs `casual`) caused the 2025 ridership decline and which stations (`station_name`) are currently strained so we can assess the possibility of expanding them or adding new ones in the `neighborhood`?
 
+## Key findings
+Cumberland Ave & 17th St station in Fort Sanders neighborhood has highest arrivals per dock,
+while Sequoyah Hills Park has the lowest number of arrivals per dock.
+
+![Arrivals per dock by station, 2025](charts/2025_arrivals_per_dock.png) 
+
+![Arrivals per dock by station, 2025](charts/Low_pressure_arrivals_per_dock_2025.png)
+
+## Limitations
+A 2 minute trip is not realistic even though used as the cutoff threshold.
+Trips over 24 hours were excluded since bikes likely never docked.
+One year of data is not enough to make a conclusion, and it's rather observational.
+
 ## Data (schema table for trips_2025.csv and stations.xlsx) 
 
 **Raw files are **not** in this repo (~22 MB, and the golden rule: never edit raw data)
@@ -36,19 +49,8 @@ Request `trips_2025.csv` and `stations.xlsx` from the Ride Knox data team.
 
 ## How to run
 -**Tools:** Python, pandas, matplotlib. 
+
 -**Reproducibility:** Install requirements, open analysis.ipynb, Restart & Run All.
-
-## Key findings
-Cumberland Ave & 17th St station in Fort Sanders neighborhood has highest arrivals per dock,
-while Sequoyah Hills Park has the lowest number of arrivals per dock.
-
-![Arrivals per dock by station, 2025](charts/2025_arrivals_per_dock.png) & 
-![Arrivals per dock by station, 2025](charts/Low_pressure_arrivals_per_dock_2025.png)
-
-## Limitations
-A 2 minute trip is not realistic even though used as the cutoff threshold.
-Trips over 24 hours were excluded since bikes likely never docked.
-One year of data is not enough to make a conclusion, and it's rather observational.
 
 ## Repo structure
 |---charts/
