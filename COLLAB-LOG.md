@@ -177,6 +177,29 @@ Q5: You used a different supported theme than the class; name it. If your embedd
 
 Theme used is jekyll-theme-slate. Image rendering failure could be attributed to unstaged or uncommited charts, or a wrong relative path. Perhaps using git status command or opening the ride-knox-analysis charts folder could help trouble shoot the issue further.
 
+Part 6: Peer Review
+
+TODO 6b-alt. Push to your fork and open a cross-repo pull request back to the original repo. In the PR, leave one line comment explaining your change. Paste the PR URL.
+
+Q6: In your own words: why does "Request changes" on a pull request tend to sting less than the same feedback delivered verbally in a meeting?
+This is because request changes on a pull request separates the code from the coder, while in a meeting, the coder is addressed directly and not his work. It feels more personal in a meeting.
+
+Part 7: Portfolio Polish 
+
+Make the repo yours and findable.
+TODO 7a. Create (or update) your profile README, the repo named exactly after your GitHub username, with a one-paragraph "who I am + best work" intro and a short tools line (e.g., Python · pandas · Git · GitHub Pages). Paste the profilegti README URL.
+https://github.com/charlesmunga21/charlesmunga21/blob/main/README.md 
+
+TODO 7b. Pin ride-knox-analysis to your GitHub profile. Paste a screenshot of the pinned repo.
+Attached and committed.
+
+TODO 7c. Confirm your repo README leads with the finding; the chart and a one-sentence headline near the top, not a wall of code. If it doesn't yet, fix it with a quick commit (through a branch + PR) and note the PR link.
+https://github.com/charlesmunga21/ride-knox-analysis/pull/7 
+
+Q7: A hiring manager has 60 seconds and 40 open repo tabs. Name two concrete things in your repo that would make them click into yours.
+-A real README that leads with key findings
+-Clickable github.io link to the repositpory so they don’t have to comb through codes & docs.
+
 
 
 
