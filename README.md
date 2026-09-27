@@ -1,7 +1,8 @@
 # Ride Knox Ridership Analysis, 2025–2026
 
-**Headline:** The 2026 Day Pass brought non-member ridership most of the way back to
-its pre-price-increase level, without pulling members away from their memberships.
+**Headline:** Six months after launch, the Day Pass has recovered most of the
+non-member ridership Ride Knox lost to the 2025 price increase, without cannibalizing
+memberships.
 
 ## 2026 chapter: did the Day Pass work?
 
@@ -101,3 +102,12 @@ requirements.txt
 _config.yml
 .gitignore
 ```
+
+## Open questions for the fall
+
+- Without day-pass customer IDs, we can't tell recovered riders from new ones who never
+  rode before 2026 — worth asking the vendor to expose a pass ID.
+- The Day Pass launched in March; a full fall/winter cycle will tell us whether the
+  recovery holds outside the spring/summer season this data covers.
+- Bearden's per-dock use doubled in H1 2026 but is still last of 25 stations in absolute
+  terms — worth watching before committing to a relocation.
