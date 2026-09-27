@@ -16,6 +16,7 @@ its own — the Day Pass isn't cannibalizing memberships.
 
 - [The 2025 report](2025/memo.md) — what caused the original decline
 - [The 2026 memo](2026/memo_2026.md) — the board memo behind the verdict above
+- [Release note](RELEASE-NOTE.md) — a plain-language summary for the Director of Operations
 - [README](README.md) — for the technically curious: data, notebooks, how to run
 
 ## Limitations
