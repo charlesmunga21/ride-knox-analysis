@@ -1,8 +1,8 @@
 # Ride Knox Ridership Analysis, 2025–2026
 
-**Headline:** Six months after launch, the Day Pass has recovered most of the
-non-member ridership Ride Knox lost to the 2025 price increase, without cannibalizing
-memberships.
+**Headline:** Six months after launch, the Day Pass has brought non-member ridership
+back to within a few points of its pre-price-increase level, while member ridership
+kept growing on its own — the Day Pass isn't cannibalizing memberships.
 
 ## 2026 chapter: did the Day Pass work?
 
