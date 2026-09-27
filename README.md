@@ -48,9 +48,19 @@ Request `trips_2025.csv` and `stations.xlsx` from the Ride Knox data team.
 | year_installed | int64 | Earliest installation in 2022 |
 
 ## How to run
--**Tools:** Python, pandas, matplotlib. 
+**Tools:** Python, pandas, matplotlib, openpyxl.
 
--**Reproducibility:** Install requirements, open analysis.ipynb, Restart & Run All.
+**Setup:** `pip install -r requirements.txt`
+
+**2025 analysis:** request `trips_2025.csv`, `stations.xlsx`, `trips_2026_h1.csv`, and
+`stations_2026.xlsx` from the Ride Knox data team, place them in `2025/`, then open
+`2025/analysis.ipynb` and Restart & Run All.
+
+**2026 analysis:** place the same four data files in `2026/`, then open
+`2026/analysis_2026.ipynb` and Restart & Run All.
+
+Each notebook reads its data files from its own folder, so the raw files (never
+committed — see Data section) need a copy next to whichever notebook you're running.
 
 ## Repo structure
 |---2025/
