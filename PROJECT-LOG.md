@@ -230,7 +230,17 @@ since it hadn't been given a branch name on Riley's side yet).
 
 ## Part D — Q&A
 
-**Q-D1.** _(filled in after Part D merges.)_
+**Q-D1.** Before this part, `charlesmunga21.github.io/ride-knox-analysis/` showed the
+old `index.md`: a 2025-only story (which rider group caused the 2025 decline, which
+stations were strained), with no links to anything else — a dead end, and a year out of
+date now that the Day Pass reversed the story. After this part, the home page leads with
+the 2026 verdict ("the Day Pass worked") and its recovery chart above the fold, then
+links out to the 2025 report, the 2026 memo, and the README (release note link added in
+#15). Confirmed live: home page, both linked memo pages, and the embedded chart all
+return 200; `2025/memo.md`/`2026/memo_2026.md` render as proper HTML pages via GitHub
+Pages' relative-links rewriting, while `README.md` is served as-is (GitHub Pages
+excludes README.md from HTML conversion by default) — acceptable since it's explicitly
+the "for the technically curious" link, not one of the three readable pages.
 
 ---
 
