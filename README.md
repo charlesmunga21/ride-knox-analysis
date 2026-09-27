@@ -1,7 +1,7 @@
 # Ride Knox Ridership Analysis, 2025–2026
 
-**Headline:** The 2026 Day Pass brought non-member ridership most of the way back to
-its pre-price-increase level, without pulling members away from their memberships.
+**Headline:** The 2026 Day Pass brought non-member ridership back to within a few
+points of its pre-price-increase level, while member ridership kept growing on its own.
 
 ## 2026 chapter: did the Day Pass work?
 
