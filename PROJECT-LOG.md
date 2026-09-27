@@ -267,5 +267,123 @@ relying on someone's memory or a saved screenshot.
 
 ## Part F — Final state
 
-_(final `git status`, final `git push`, final `git log --oneline`, branch cleanup —
-filled in last.)_
+All branches used for this project (`8-separate-year-folders`, `10-extend-gitignore`,
+`11-integrate-2026-bundle`, `12-requirements-and-readme-run`, `13-two-year-readme`,
+`14-rebuild-pages-home`, `15-release-note`) are deleted, both locally and on GitHub —
+`gh pr merge --delete-branch` handled each at merge time. The three stale branches left
+over from Assignments 5–6 (`chore/tidy-report`, `docs/project-readme`, `fix/README`) and
+one more found during this project (`chore/enable-pages`) were also already-merged and
+have now been deleted, locally and on GitHub. `master` is the only branch left in either
+place.
+
+Issues #8–#15 (all opened for this project) are closed. Issues #2 and #3 are pre-existing
+data-quality issues from before this project (missing `end_station_id`, negative
+duration) — left open on purpose, since they're real, unresolved data questions unrelated
+to this Git-workflow project, and closing them without investigating would misrepresent
+their status.
+
+Final `git status`:
+
+```
+On branch master
+Your branch is up to date with 'origin/master'.
+
+nothing to commit, working tree clean
+```
+
+Final `git push`:
+
+```
+Everything up-to-date
+```
+
+Final `git log --oneline` (newest first, full project history):
+
+```
+51b414c Record the Part E audit answer (change history + auditability)
+f753b94 Merge pull request #22 from charlesmunga21/15-release-note
+0646352 Write RELEASE-NOTE.md and link it from the home page
+ea71edf Record Q-D1 answer and live-site verification
+d470ba3 Merge pull request #21 from charlesmunga21/14-rebuild-pages-home
+ff6a7da Rebuild the Pages home page for the two-year story
+19901e0 Record the two-laptop transcript and Q-C1/Q-C2/Q-C3 answers
+f729e2f Merge pull request #20 from charlesmunga21/13-two-year-readme
+01aa1dc [riley] Merge, resolving the headline conflict
+c5446b9 [you] Tighten the headline wording
+9c4e7c7 [riley] Reword headline and add Open questions section
+f353330 [you] Rewrite README.md as the two-year story
+d39d8ba Merge pull request #19 from charlesmunga21/12-requirements-and-readme-run
+beb7c5e Add requirements.txt and update README How-to-run for both notebooks
+50e6a76 Record Part B proof output and Q-B2 answer in the log
+ba482db Merge pull request #18 from charlesmunga21/11-integrate-2026-bundle
+3eb2e16 Bring in the 2026 notebook, memo, and charts
+e744078 Merge pull request #17 from charlesmunga21/8-separate-year-folders
+3502b8d Separate 2025 and 2026 artifacts into year-scoped folders
+682869a Merge pull request #16 from charlesmunga21/10-extend-gitignore
+da980d6 Extend .gitignore ahead of the 2026 hand-off
+262dd3e Fix issue numbers in Q-A1 answer (PRs share the issue sequence)
+67727df Add PROJECT-LOG.md with starting state and log-commit policy
+c8c64b4 Created a fork to a public repo & executed final push to update the origin master
+a267e03 Created a personal portfolio with a profile README
+ffe3a1b Pinned the ride-knox-analysis repo to my profile
+f21e941 Merge pull request #7 from charlesmunga21/fix/README
+f66d0be Updated the READMME to start with key findings
+a3d31c3 Published live pages on Github
+8cdcac4 Added the screenshot showing live pages link on side bar
+41e4b8d Merge pull request #6 from charlesmunga21/chore/enable-pages
+7213fc3 Add Ride Knox Ridership Analysis for 2025
+46cbcc2 Add configuration for Jekyll site
+cc3f23a Created a merge conflict on a branch and resolved it through a PR
+241598b Merge pull request #5 from charlesmunga21/docs/project-readme
+f88c674 Resolved the merge conflict in the bottom-line section of the memo
+74902dc Fixed the wording on the same bottom-line sentence in memo
+9570f6e Added charts, reworded bottom-line in memo, and added a README file
+6e5825d Created the repository README markdown file
+cc18683 Reworded the bottom-line headline sentence in the memo
+f7b0b17 Added a chart showing docks with lower use
+7be9995 Created a PR, commented, self-reviewed it and merged it to main branch
+116d13e Added screenshot evidence of PR comment with successful merge
+a66800d Merge pull request #4 from charlesmunga21/chore/tidy-report
+69b1041 Updated COLLAB-LOG before starting PR
+3892b6a created a branch that will be used to execute pull request on GitHub
+7711b63 Added a message in the memo recommendation indicating that raw files are not on the repo
+588d215 Created 3 issues on GitHub and referenced them
+361b324 Added a png of the cross_link referencing README at missing end_stations
+3859a99 Added COLLAB-LOG markdown that will track all code outputs and answers to assignment questions
+3f6453c Added remarks on AI use confirming this work's originality
+366bf32 Tested how git draws and presented output in the worklog
+aedd5fa Revert "The same 2 min line changed on master branch to test divergence"
+82ba326 The same 2 min line changed on master branch to test divergence
+79cb3b7 Added screenshot evidence that will be attached with assignment
+73d8454 fixed commit error for the 1 to  2 min changes in notebook cleaning cell
+04832f3 Added comment on how git and github secure work
+7d6f56f Keep local WORKLOG and finish pull
+85abb71 Updated the date to indicate when recovery test occurred
+706938d Resolve WORKLOG merge and keep local history
+83c2f09 Updates before git pull is executed
+706f9b9 Tested cloning to see how push responds after commit in worklog
+3cafbf0 Updated worklog history after git push execution
+e7fb35e Created a change in memo max durations in two branches and fixed the conflict
+2b3a50a Resolved max duration conflict by keeping main branch wording
+b711a56 Updated max duration in memo on main branch
+cf8e644 Updated maximum duration wording in memo
+b880872 Added the 24 -hour max limitation
+1e20257 Updated main branch with new min-duration using merge
+d1efcd8 Fixed minimum trip duration from 1 to 2 minutes
+f152051 Added the 1 minute cutoff limitation in report to fit question
+339d78c Fixed exaggerated claim in part 4 using revert & stated why
+540504f Revert "Add exaggerated claim (on purpose, for Part 4)"
+d2247e6 Add exaggerated claim (on purpose, for Part 4)
+f4115fd tested the function of restore unstaging in WORKLOG
+9326fc0 Fixed wrongfully staged analysis file
+fa49493 fixed paragraph deletion from the memo by restoring original file
+38fe329 Reword trips affected by January app bug
+3ff306c Add gitignore to exclude large raw data files and temporary files
+3f23ef3 Added the tracking document for this repo
+ccc21da Added code netbook and corresponding charts showing ridership trend
+e3ebe1f Add report answering manager question on whether ridership is down
+```
+
+**Deliverables:**
+1. Repository: https://github.com/charlesmunga21/ride-knox-analysis
+2. Live Pages site: https://charlesmunga21.github.io/ride-knox-analysis/
