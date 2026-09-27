@@ -2,4 +2,7 @@ scratch/
 stations.xlsx
 stations_2026.xlsx
 trips_2025.csv
+trips_2026_h1.csv
+ride_knox_api_token.txt
+.ipynb_checkpoints/
 ~$*
