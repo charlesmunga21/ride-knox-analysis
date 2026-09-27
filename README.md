@@ -7,9 +7,9 @@ Which rider group, (`member` vs `casual`) caused the 2025 ridership decline and 
 Cumberland Ave & 17th St station in Fort Sanders neighborhood has highest arrivals per dock,
 while Sequoyah Hills Park has the lowest number of arrivals per dock.
 
-![Arrivals per dock by station, 2025](charts/2025_arrivals_per_dock.png) 
+![Arrivals per dock by station, 2025](2025/charts/2025_arrivals_per_dock.png) 
 
-![Arrivals per dock by station, 2025](charts/Low_pressure_arrivals_per_dock_2025.png)
+![Arrivals per dock by station, 2025](2025/charts/Low_pressure_arrivals_per_dock_2025.png)
 
 ## Limitations
 A 2 minute trip is not realistic even though used as the cutoff threshold.
@@ -53,20 +53,21 @@ Request `trips_2025.csv` and `stations.xlsx` from the Ride Knox data team.
 -**Reproducibility:** Install requirements, open analysis.ipynb, Restart & Run All.
 
 ## Repo structure
-|---charts/
-    |__2025_arrivals_per_dock.png
-    |__2026_rider_type_by_day.png
-    |__High_pressure_arrivals_per_dock_2026.png
-    |__Low_pressure_arrivals_per_dock_2026.png
-    |__member_vs_nonmember_monthly_trips.png
-    |__monthly_duration_median.png
-    |__ridership_trips_by_type.png
-|---Notebooks/
+|---2025/
     |__analysis.ipynb
+    |__memo.md
+    |__charts/
+|---2026/
+    |__analysis_2026.ipynb
+    |__memo_2026.md
+    |__charts/
 |---WORKLOG.md
 |---COLLAB-LOG.md
-|---memo.md
+|---PROJECT-LOG.md
 |---repository_evidence.png
 |---Line_comment_PR.png
 |---Mention_cross_link.png
 |---.gitignore
+
+(2025/ is this repo's original ridership analysis, unchanged; 2026/ is the follow-up
+analysis added on top of it — see each folder's own notebook and memo.)
