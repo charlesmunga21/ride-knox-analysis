@@ -246,13 +246,22 @@ the "for the technically curious" link, not one of the three readable pages.
 
 ## Part E — Audit answer
 
-**Change history (five commits/PRs that tell this release's story):**
+**Change history (five merged PRs that tell this release's story):**
 
-_(filled in once Part B–E PRs are merged.)_
+| Date | Commit | What it means, in plain English |
+| --- | --- | --- |
+| 2026-09-26 | `e744078` | Split the site into a 2025 area and a 2026 area, so the two years can never be confused with each other. |
+| 2026-09-26 | `ba482db` | Added the full 2026 Day Pass analysis on top of the existing 2025 analysis, without touching it. |
+| 2026-09-26 | `f729e2f` | Rewrote the front page's story to cover both years together, reviewed by a second analyst before it went live. |
+| 2026-09-26 | `d470ba3` | Replaced the public home page's headline finding with the 2026 verdict and its chart. |
+| 2026-09-26 | `f753b94` | Published a plain-language release note for leadership, linked from the home page. |
 
-**Why this page is auditable (stakeholder language):**
-
-_(filled in alongside the change history.)_
+**Why this page is auditable (stakeholder language):** Every one of the changes above
+went through the same open review step before it became public, so there's a
+timestamped, named record of who proposed each change, who looked at it, and why it was
+made — not just what the page says today. If someone claims the page said something
+different last month, we can point to the exact date and reason it changed, instead of
+relying on someone's memory or a saved screenshot.
 
 ---
 
