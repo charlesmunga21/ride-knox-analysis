@@ -123,7 +123,108 @@ manually with the result recorded in the issue comment, no PR needed.
 
 ## Part C — Two-laptop transcript ([you] / [riley])
 
-_(filled in live during Part C — see below.)_
+Shared branch `13-two-year-readme`, created off `master` and pushed empty first so
+Riley's clone could find it. Riley's clone: `ride-knox-riley`, a second `git clone` of
+the same repo on this machine, with `git config user.name "Riley Chen"` /
+`user.email "riley.chen@example.com"` set locally (that clone only).
+
+```
+[you]    $ git switch -c 13-two-year-readme
+         Switched to a new branch '13-two-year-readme'
+[you]    $ git push -u origin 13-two-year-readme
+         * [new branch]      13-two-year-readme -> 13-two-year-readme
+
+[you]    (rewrote README.md as the two-year story: headline, 2026 chapter, 2025
+          chapter, combined limitations, two-year data table, how-to-run)
+[you]    $ git add README.md
+[you]    $ git commit -m "[you] Rewrite README.md as the two-year story"
+[you]    $ git push
+         f353330..c5446b9? (first push of this commit: d39d8ba..f353330 master -> 13-two-year-readme)
+
+[riley]  $ git clone https://github.com/charlesmunga21/ride-knox-analysis.git ride-knox-riley
+[riley]  $ git switch 13-two-year-readme
+         Switched to a new branch '13-two-year-readme'
+         branch '13-two-year-readme' set up to track 'origin/13-two-year-readme'.
+[riley]  $ git config user.name "Riley Chen"
+[riley]  $ git config user.email "riley.chen@example.com"
+
+[riley]  (reworded the headline sentence differently than [you]'s wording; added a new
+          "Open questions for the fall" section)
+[riley]  $ git add README.md
+[riley]  $ git commit -m "[riley] Reword headline and add Open questions section"
+         (committed locally — NOT pushed yet)
+
+[you]    (edited the same headline sentence again: "within a few points ... member
+          ridership kept growing on its own")
+[you]    $ git add README.md
+[you]    $ git commit -m "[you] Tighten the headline wording"
+[you]    $ git push
+         f353330..c5446b9  13-two-year-readme -> 13-two-year-readme      (succeeds — first push)
+
+[riley]  $ git push
+         ! [rejected]        13-two-year-readme -> 13-two-year-readme (fetch first)
+         error: failed to push some refs to 'https://github.com/charlesmunga21/ride-knox-analysis.git'
+         hint: Updates were rejected because the remote contains work that you do not
+         hint: have locally. This is usually caused by another repository pushing to
+         hint: the same ref. If you want to integrate the remote changes, use
+         hint: 'git pull' before pushing again.
+         hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+[riley]  $ git pull
+         Auto-merging README.md
+         CONFLICT (content): Merge conflict in README.md
+         Automatic merge failed; fix conflicts and then commit the result.
+
+         README.md conflict block:
+         <<<<<<< HEAD
+         **Headline:** Six months after launch, the Day Pass has recovered most of the
+         non-member ridership Ride Knox lost to the 2025 price increase, without cannibalizing
+         memberships.
+         =======
+         **Headline:** The 2026 Day Pass brought non-member ridership back to within a few
+         points of its pre-price-increase level, while member ridership kept growing on its own.
+         >>>>>>> c5446b9fb9b016b06884cfe8d6e9e13ab4d5b27b
+
+[riley]  (resolved by blending both: kept the "within a few points" / member-ridership
+          point from [you]'s side, and the explicit "not cannibalizing memberships"
+          conclusion from Riley's side)
+[riley]  $ git add README.md
+[riley]  $ git commit -m "[riley] Merge, resolving the headline conflict"
+[riley]  $ git push
+         c5446b9..01aa1dc  13-two-year-readme -> 13-two-year-readme      (succeeds)
+
+[you]    $ git pull
+         Fast-forward, README.md updated with Riley's merge
+
+(GitHub) Opened PR #20 for 13-two-year-readme -> master, left a review line comment,
+         merged with "Closes #13".
+
+[you]    $ git switch master && git pull      -> f729e2f
+[riley]  $ git switch master && git pull      -> f729e2f      (identical to [you]'s master)
+```
+
+### Q-C1
+In Assignment 5, Part 8, nothing else had pushed to that branch between the clone and
+the push — the remote was exactly where the clone left it. Here, [you] pushed a new
+commit to the *same shared branch* in the gap between Riley's clone/commit and Riley's
+own push, so the remote had moved ahead of what Riley's local branch pointer knew about.
+Riley's push was a non-fast-forward for that reason alone.
+
+### Q-C2
+The conflict lived entirely on the shared feature branch (`13-two-year-readme`) — never
+on `master`. That's the point of "main is sacred": every change, including the messy
+part where two people edit the same line, happens on a branch first, and only a clean,
+reviewed result ever reaches `master` via PR. The habit that keeps this kind of conflict
+small is the "resolve early, resolve small" one from class — pull/sync with the shared
+branch often instead of letting local edits drift for days before pushing, so any overlap
+is caught while it's still a few lines, not a few files.
+
+### Q-C3
+`HEAD` marked Riley's own local commit — the tip of Riley's branch as it stood right
+before running `git pull`. Riley never typed the word; `git pull`'s merge step inserts
+that label automatically to distinguish "what you already had checked out" (`HEAD`)
+from "what just came in from the remote" (labeled by the incoming commit's hash here,
+since it hadn't been given a branch name on Riley's side yet).
 
 ---
 
