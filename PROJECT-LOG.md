@@ -54,8 +54,8 @@ Tree is clean; history confirmed intact from Assignments 5–6.
 
 ## Part A — Q&A
 
-**Q-A1.** Issue **#6** ("Extend `.gitignore` before the 2026 hand-off is added") had to
-be done before **#7** ("Bring in the 2026 notebook, memo, and charts"). The hazard:
+**Q-A1.** Issue **#10** ("Extend `.gitignore` before the 2026 hand-off is added") had to
+be done before **#11** ("Bring in the 2026 notebook, memo, and charts"). The hazard:
 the 2026 hand-off folder contains `ride_knox_api_token.txt` (a credential file) and raw
 data (`trips_2026_h1.csv`). The existing `.gitignore` was written for 2025 only and does
 not cover either. If the bundle were copied in and `git add .` run before extending the
@@ -81,7 +81,7 @@ no undo once public (GitHub's history is fetchable by anyone who cloned before r
 are invisible to Git:
 
 ```
-(pasted after PR #7 merges)
+(pasted after PR closing #11 merges)
 ```
 
 ---
