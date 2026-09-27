@@ -417,15 +417,24 @@ headline conflict, reviewed every PR before merging, & verified the live site.
 are my own.
 
 ## Submission Checklist confirmed
-•	[ ] Both URLs submitted on Canvas; site loads in a private window
-•	[ ] PROJECT-LOG.md pushed: starting state, all pasted outputs, the labeled two-laptop transcript, every Q: answer, change history, reflection, AI disclosure
-•	[ ] ≥6 issues, all closed, two on the full template (one about the repo itself)
-•	[ ] Every change on main arrived by PR (except declared log commits); every PR says why and Closes #N
-•	[ ] The rejected push and the conflict are both in the transcript, with your explanation
-•	[ ] Repo layout separates the years; both notebooks' run instructions work from a fresh clone
-•	[ ] index.md home page: 2026 verdict + chart up top; links to 2025 report, 2026 memo, release note, README; all working
-•	[ ] Required theme set; About sidebar shows the live URL
-•	[ ] RELEASE-NOTE.md: 150–250 words, jargon-free, linked from the home page
-•	[ ] requirements.txt present; git status --ignored output in the log shows data + excluded items on disk but untracked
-•	[ ] No data files, no credentials, no scratch/ anywhere on GitHub
-•	[ ] All feature branches deleted; final git status clean; final git log --oneline pasted
+[ ] Both URLs submitted on Canvas; site loads in a private window
+[ ] PROJECT-LOG.md pushed: starting state, all pasted outputs, the labeled two-laptop transcript, every Q: answer, change history, reflection, AI disclosure
+[ ] ≥6 issues, all closed, two on the full template (one about the repo itself)
+[ ] Every change on main arrived by PR (except declared log commits); every PR says why and Closes #N
+[ ] The rejected push and the conflict are both in the transcript, with your explanation
+[ ] Repo layout separates the years; both notebooks' run instructions work from a fresh clone
+[ ] index.md home page: 2026 verdict + chart up top; links to 2025 report, 2026 memo, release note, README; all       working
+[ ] Required theme set; About sidebar shows the live URL
+[ ] RELEASE-NOTE.md: 150–250 words, jargon-free, linked from the home page
+[ ] requirements.txt present; git status --ignored output in the log shows data + excluded items on disk but untracked
+[ ] No data files, no credentials, no scratch/ anywhere on GitHub
+[ ] All feature branches deleted; final git status clean; final git log --oneline pasted
+
+
+`$ git status`
+    On branch master
+        Your branch is ahead of 'origin/master' by 1 commit.
+    (use "git push" to publish your local commits)
+
+    nothing to commit, working tree clean
+
