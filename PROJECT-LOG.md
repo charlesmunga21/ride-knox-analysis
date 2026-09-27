@@ -75,14 +75,49 @@ use the token to pull data from the vendor's API under Ride Knox's account — a
 credential leak, not a data leak, but with account-takeover/API-abuse consequences and
 no undo once public (GitHub's history is fetchable by anyone who cloned before removal).
 
-**Q-B2.** _(filled in after the reorg PR merges — see below.)_
+**Q-B2.** Moving `analysis.ipynb`, `memo.md`, and everything in `charts/` into `2025/`
+(#8) broke the relative image paths that `README.md` and `index.md` depended on —
+`charts/2025_arrivals_per_dock.png` no longer existed once the folder moved to
+`2025/charts/2025_arrivals_per_dock.png`. Caught it by grepping every `.md` file in the
+repo for `charts/` before moving anything, so both files were fixed in the same PR that
+did the move, and confirmed live on the Pages site immediately after merging (see below).
 
-`git status --ignored` after the reorg + integration, proving data/token sit on disk but
-are invisible to Git:
+`git status` right after staging the #11 integration (only the five intended files
+staged):
 
 ```
-(pasted after PR closing #11 merges)
+On branch 11-integrate-2026-bundle
+Changes to be committed:
+	new file:   2026/analysis_2026.ipynb
+	new file:   2026/charts/daypass_vs_others.png
+	new file:   2026/charts/recovery_vs_2025.png
+	new file:   2026/charts/station_pressure_change.png
+	new file:   2026/memo_2026.md
 ```
+
+`git status --ignored` for `2026/`, proving the raw data and the credential sit on disk
+but are invisible to Git:
+
+```
+	2026/stations.xlsx
+	2026/stations_2026.xlsx
+	2026/trips_2025.csv
+	2026/trips_2026_h1.csv
+	scratch/
+	stations.xlsx
+	stations_2026.xlsx
+	trips_2025.csv
+	~$_instructions_git.docx
+```
+
+Live-site check after merging #8's reorg: `index.md` (200), and both moved chart images
+under `2025/charts/` (200/200) — no broken images.
+
+**Issue #9 resolution:** re-ran `2026/analysis_2026.ipynb` top-to-bottom inside the repo
+(after installing `pandas`/`matplotlib`/`openpyxl`, now pinned in `requirements.txt`)
+against the same raw files used elsewhere in the repo. June `casual_plus_dp_yoy_%` came
+out to 11.9%, which rounds to the memo's stated "+12%." Confirmed accurate; closed #9
+manually with the result recorded in the issue comment, no PR needed.
 
 ---
 
