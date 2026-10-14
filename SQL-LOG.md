@@ -1,3 +1,544 @@
+# DATA 501 Assignment 8 SQL Log
+
+**Name:*Charles Munga Muiruri*
+**NetID:*cmuiruri*
+**SQL tool used:*SQLite VS Code extension*
+
+## Part 0
+TODO 0a. Open ride_knox.db and run the four-count query from the Module 8 slides exactly as it appears there; COUNT(*), COUNT(end_station_id), COUNT(DISTINCT start_station_id), COUNT(DISTINCT rider_type). Paste the output. It should reproduce the anchors above; if it doesn't, you have the wrong database file.
+```sqlite> SELECT
+   ...> COUNT(*)AS rows_total,                         
+   ...> COUNT(end_station_id) AS with_end_station,
+   ...> COUNT(DISTINCT start_station_id) AS distinct_start_ids,
+   ...> COUNT(DISTINCT rider_type) AS rider_type_spellings
+   ...> FROM trips;
+╭────────────┬──────────────────┬────────────────────┬──────────────────────╮
+│ rows_total │ with_end_station │ distinct_start_ids │ rider_type_spellings │
+╞════════════╪══════════════════╪════════════════════╪══════════════════════╡
+│     250000 │           246233 │                 25 │                    6 │
+╰────────────┴──────────────────┴────────────────────┴──────────────────────╯```
+
+TODO 0b. Add ## Part 0 through ## Part 10 headings to SQL-LOG.md, create queries/ if it isn't still there from last week, and commit both with a message that says what they are.
+```Updated the log with subsequent module 8 queries for SQL-LOG.md
+Updated the qeries with module 8 TODO instructions for ride-knox-queries```
+
+Q0c: Two of those four counts are diagnostics; numbers that tell you something is wrong with the data rather than something about Ride Knox's business. Name them and say what each one reveals.
+```with_end_station and  rider_type_spellings; these two numbers are diagnostic because they give information that the raw face value of the database does not expose. With_end_station 246233 tells us that 3767 of 250000 trips have no end station IDS and the 6 rider_type_spellings tell us that even though we have two rider groups, casual and member, the names have variable spelling which tells us to query the data with caution instead of assuming everything is correct```
+
+Part 1: Aggregate Functions & the COUNT Family (10 pts)
+
+Save these in queries/part1.sql.
+
+TODO 1a. The ops lead wants a capacity summary of the network. From stations alone, return in one row: the total number of docks, the average docks per station rounded to 1 decimal, the smallest station's dock count, and the largest station's dock count. Alias every column. (Class aggregated trips; this aggregates the other table.)
+```sqlite> SELECT
+   ...>     SUM(docks) AS total_docks,
+   ...>     ROUND(AVG(docks), 1) AS avg_docks_per_station,
+   ...>     MIN(docks) AS smallest_station_docks,
+   ...>     MAX(docks) AS largest_station_docks
+   ...> FROM stations;
+╭─────────────┬──────────────────────┬──────────────────────┬──────────────────────╮
+│ total_docks │ avg_docks_per_sta... │ smallest_station_... │ largest_station_d... │
+╞═════════════╪══════════════════════╪══════════════════════╪══════════════════════╡
+│         330 │                 13.8 │                   10 │                   24 │
+╰─────────────┴──────────────────────┴──────────────────────┴──────────────────────╯```
+
+TODO 1b. She thinks in hours, not minutes. Return in one row the count of trips plus the average, shortest, and longest trip duration in hours, rounded to 2 decimal places. 
+```sqlite> SELECT
+   ...>     COUNT(*) AS trips,
+   ...>     ROUND(AVG((julianday(end_time) - julianday(start_time)) * 24), 2) AS avg_hours,
+   ...>     ROUND(MIN((julianday(end_time) - julianday(start_time)) * 24), 2) AS shortest_hours,
+   ...>     ROUND(MAX((julianday(end_time) - julianday(start_time)) * 24), 2) AS longest_hours
+   ...> FROM trips;
+╭────────┬───────────┬────────────────┬───────────────╮
+│ trips  │ avg_hours │ shortest_hours │ longest_hours │
+╞════════╪═══════════╪════════════════╪═══════════════╡
+│ 250000 │      0.47 │          -1.75 │         71.81 │
+╰────────┴───────────┴────────────────┴───────────────╯```
+
+TODO 1c. Two of the three duration figures in 1b are impossible. Rerun 1b with a WHERE clause that keeps only trips lasting between 1 minute and 6 hours, and paste the new result next to the old one.
+```sqlite> SELECT
+   ...>     COUNT(*) AS trips,
+   ...>     ROUND(AVG((julianday(end_time) - julianday(start_time)) * 24), 2) AS avg_hours,
+   ...>     ROUND(MIN((julianday(end_time) - julianday(start_time)) * 24), 2) AS shortest_hours,
+   ...>     ROUND(MAX((julianday(end_time) - julianday(start_time)) * 24), 2) AS longest_hours
+   ...> FROM trips
+   ...> WHERE (julianday(end_time) - julianday(start_time)) * 1440 BETWEEN 1 AND 360; 
+╭────────┬───────────┬────────────────┬───────────────╮
+│ trips  │ avg_hours │ shortest_hours │ longest_hours │
+╞════════╪═══════════╪════════════════╪═══════════════╡
+│ 248230 │      0.28 │           0.02 │           3.0 │
+╰────────┴───────────┴────────────────┴───────────────╯```
+
+TODO 1d. What share of the fleet's usage is electric? Return one row giving the total trip count, the electric-bike trip count, and the percentage of trips taken on electric bikes, rounded to 1 decimal. (Class computed a percentage of trips with a recorded end station; different column, same trap.)
+```sqlite> SELECT
+   ...>     COUNT(*) AS total_trips,
+   ...>     COUNT(CASE WHEN LOWER(bike_type) = 'electric' THEN 1 END) AS electric_trips,
+   ...>     ROUND(
+   ...>         COUNT(CASE WHEN LOWER(bike_type) = 'electric' THEN 1 END) * 100.0 / COUNT(*),
+   ...>         1
+   ...>     ) AS electric_pct
+   ...> FROM trips;
+╭─────────────┬────────────────┬──────────────╮
+│ total_trips │ electric_trips │ electric_pct │
+╞═════════════╪════════════════╪══════════════╡
+│      250000 │          95083 │         38.0 │
+╰─────────────┴────────────────┴──────────────╯```
+
+Q1e: Compare your 1b and 1c averages. Which figure would you put in a report for the ops lead, and what one sentence would you write underneath it so the number can't be misread?
+```The 1b average is 0.47 hours across all 250,000 trips, including impossible durations(negative and more than 1 day). I’d report the filtered 1c average of 0.28 hours and frame it this way:
+Among the 248,230 trips lasting between 1 minute and 6 hours, the average duration was 0.28 hours.```
+
+Q1f: In 1d, what happens if you write * 100 instead of * 100.0? Run it and paste the result. Explain what SQLite did and why.
+
+```sqlite> SELECT
+   ...>     COUNT(*) AS total_trips,
+   ...>     COUNT(CASE WHEN LOWER(bike_type) = 'electric' THEN 1 END) AS electric_trips,
+   ...>     COUNT(CASE WHEN LOWER(bike_type) = 'electric' THEN 1 END) * 100 / COUNT(*) AS electric_pct
+   ...> FROM trips;
+╭─────────────┬────────────────┬──────────────╮
+│ total_trips │ electric_trips │ electric_pct │
+╞═════════════╪════════════════╪══════════════╡
+│      250000 │          95083 │           38 │
+╰─────────────┴────────────────┴──────────────╯
+SQLite performed integer division. The numerator (95083 * 100) and denominator (250000) are both integers. SQLite truncated/shortened the fractional part (numerator/denominator), so the result is 38 and not 38.0332.... Using 100.0 makes the arithmetic floating-point(includes all the decimal points); then ROUND(..., 1) returns 38.0.```
+
+Part 2: GROUP BY; Grouping Keys & Derived Keys (12 pts)
+
+Save these in queries/part2.sql.
+
+TODO 2a. Return the trip count for each start station ID, busiest first. Paste the first 5 rows and the row count. (How many groups did you get, and does that match the number of stations?)
+```sqlite> SELECT start_station_id, COUNT(*) AS trips
+   ...> FROM trips
+   ...> GROUP BY start_station_id
+   ...> ORDER BY trips DESC
+   ...> LIMIT 5;
+╭──────────────────┬───────╮
+│ start_station_id │ trips │
+╞══════════════════╪═══════╡
+│ S06              │ 26058 │
+│ S08              │ 24959 │
+│ S01              │ 22606 │
+│ S11              │ 18934 │
+│ S02              │ 16542 │
+╰──────────────────┴───────╯```
+```There are 25 start-station ID groups, compared with 24 stations. The extra group is an ID in trips that isn’t represented in `stations` ```
+
+TODO 2b. The ops lead is planning shift schedules and wants to know when the system is busy. Using strftime('%H', start_time), return the trip count for each hour of the day, and show the 6 busiest hours. (Class grouped by month; same technique, different derived key.)
+```sqlite> SELECT strftime('%H', start_time) AS rush_hours,
+   ...> COUNT(*) AS trips
+   ...> FROM trips
+   ...> WHERE (julianday(end_time) - julianday(start_time)) * 1440 BETWEEN 1 AND 1440
+   ...> GROUP BY rush_hours
+   ...> ORDER BY trips DESC
+   ...> LIMIT 6;
+╭────────────┬───────╮
+│ rush_hours │ trips │
+╞════════════╪═══════╡
+│ '17'       │ 24986 │
+│ '08'       │ 21605 │
+│ '18'       │ 21252 │
+│ '16'       │ 19082 │
+│ '12'       │ 16560 │
+│ '07'       │ 14827 │
+╰────────────┴───────╯```
+
+TODO 2c. Return the trip count and the average duration in minutes (rounded to 1) for each combination of bike type and rider type. Rider type must be normalized so you get four rows, not twelve. (Class crossed month with rider type; this crosses two different columns.)
+```sqlite> SELECT
+   ...>     bike_type,
+   ...>     LOWER(rider_type) AS rider_type,
+   ...>     COUNT(*) AS trips,
+   ...>     ROUND(AVG((julianday(end_time) - julianday(start_time)) * 1440), 1) AS avg_min
+   ...> FROM trips
+   ...> WHERE (julianday(end_time) - julianday(start_time)) * 1440 BETWEEN 1 AND 1440
+   ...> GROUP BY bike_type, LOWER(rider_type)
+   ...> ORDER BY bike_type, rider_type;
+╭───────────┬────────────┬───────┬─────────╮
+│ bike_type │ rider_type │ trips │ avg_min │
+╞═══════════╪════════════╪═══════╪═════════╡
+│ classic   │ casual     │ 56119 │    22.8 │
+│ classic   │ member     │ 97739 │    13.5 │
+│ electric  │ casual     │ 34666 │    22.9 │
+│ electric  │ member     │ 59706 │    13.5 │
+╰───────────┴────────────┴───────┴─────────╯```
+
+TODO 2d. Rerun 2c without normalizing rider_type. Paste that result too, and note the row count.
+```sqlite> SELECT
+   ...>     bike_type,
+   ...>     rider_type,
+   ...>     COUNT(*) AS trips,
+   ...>     ROUND(AVG((julianday(end_time) - julianday(start_time)) * 1440), 1) AS avg_min
+   ...> FROM trips
+   ...> WHERE (julianday(end_time) - julianday(start_time)) * 1440 BETWEEN 1 AND 1440
+   ...> GROUP BY bike_type, rider_type
+   ...> ORDER BY bike_type, rider_type;
+╭───────────┬────────────┬───────┬─────────╮
+│ bike_type │ rider_type │ trips │ avg_min │
+╞═══════════╪════════════╪═══════╪═════════╡
+│ classic   │ CASUAL     │   849 │    23.6 │
+│ classic   │ Casual     │  1180 │    21.7 │
+│ classic   │ MEMBER     │  1470 │    13.7 │
+│ classic   │ Member     │  1957 │    13.5 │
+│ classic   │ casual     │ 54090 │    22.8 │
+│ classic   │ member     │ 94312 │    13.5 │
+│ electric  │ CASUAL     │   516 │    23.7 │
+│ electric  │ Casual     │   701 │    22.6 │
+│ electric  │ MEMBER     │   874 │    12.9 │
+│ electric  │ Member     │  1183 │    14.0 │
+│ electric  │ casual     │ 33449 │    22.9 │
+│ electric  │ member     │ 57649 │    13.5 │
+╰───────────┴────────────┴───────┴─────────╯```
+```Row count is 12 total rows```
+
+Q2e: How many rows did 2d return, and how many of them describe rider types that don't really exist? Explain in one sentence what GROUP BY is actually grouping on, using the word value.
+```2d returned 12 rows where 8 rows are capitalization variants of either casual or member (CASUAL, Casual, MEMBER, and Member for each bike type). GROUP BY groups rows (in this case, bike_type and rider_type) by each `distinct value` in the grouped columns, so having different capitalization creates separate groups giving erroneous counts.```
+
+Q2f: Your 2c result is in long form; one row per combination. Describe in one or two sentences what the wideversion would look like, and name the pandas method from Module 3 that produced wide output.
+```Pandas' unstack() gives the wide version showing one row per bike type and rider types spread across columns.```
+
+Part 3: The Grouping Rule & Conditional Aggregation (8 pts)
+
+
+Save these in queries/part3.sql.
+
+
+TODO 3a. Build the wide version of Part 2c: one row per rider type (normalized), with a classic column and an electric column holding the trip counts, using the SUM(CASE WHEN … THEN 1 ELSE 0 END) idiom. Two rows, three columns. (Class pivoted rider type across months; this pivots bike type across rider types.)
+```sqlite> SELECT
+   ...>     LOWER(rider_type) AS rider_type,
+   ...>     SUM(CASE WHEN bike_type = 'classic' THEN 1 ELSE 0 END) AS classic,
+   ...>     SUM(CASE WHEN bike_type = 'electric' THEN 1 ELSE 0 END) AS electric
+   ...> FROM trips
+   ...> WHERE (julianday(end_time) - julianday(start_time)) * 1440 BETWEEN 1 AND 1440
+   ...> GROUP BY LOWER(rider_type)
+   ...> ORDER BY rider_type;
+╭────────────┬─────────┬──────────╮
+│ rider_type │ classic │ electric │
+╞════════════╪═════════╪══════════╡
+│ casual     │   56119 │    34666 │
+│ member     │   97739 │    59706 │
+╰────────────┴─────────┴──────────╯```
+
+TODO 3b. Now break the grouping rule on purpose so you can recognize it later. Write a query that groups trips by bike_type but selects rider_type alongside COUNT(*), with rider_type neither grouped nor aggregated. Run it and paste the result.
+```sqlite> SELECT bike_type, rider_type, COUNT(*) AS trips
+   ...> FROM trips
+   ...> GROUP BY bike_type;
+╭───────────┬────────────┬────────╮
+│ bike_type │ rider_type │ trips  │
+╞═══════════╪════════════╪════════╡
+│ classic   │ casual     │ 154917 │
+│ electric  │ casual     │  95083 │
+╰───────────┴────────────┴────────╯```
+
+Q3c: Did 3b produce an error, a warning, or a clean-looking answer? Explain what the value in the rider_type column actually is, and why a reader of your result would have no way to tell that anything was wrong.
+```The rider type values are arbitrary values from each bike-type group, and should not be interpreted as representative of the group```
+
+Q3d: State the grouping rule in your own words, then say what would have happened if you had run 3b against Ride Knox's production PostgreSQL database instead. Which behavior would you rather have, and why?
+```PostgreSQL would reject query 3b with an error because rider_type is neither grouped nor aggregated which was not the case with SQLite; I prefer the PostgreSQL behavior because it catches the error before it even occurs.```
+
+Part 4: HAVING vs. WHERE (10 pts)
+
+Save these in queries/part4.sql.
+
+TODO 4a. The ops lead wants to know which stations are carrying the heaviest load. Return start_station_id and the trip count for stations with more than 15,000 trips, busiest first. (Class filtered for the quiet stations with a < threshold; this is the other end of the ranking.)
+```sqlite> SELECT start_station_id, COUNT(*) AS trips
+   ...> FROM trips
+   ...> GROUP BY start_station_id
+   ...> HAVING COUNT(*) > 15000
+   ...> ORDER BY trips DESC;
+╭──────────────────┬───────╮
+│ start_station_id │ trips │
+╞══════════════════╪═══════╡
+│ S06              │ 26058 │
+│ S08              │ 24959 │
+│ S01              │ 22606 │
+│ S11              │ 18934 │
+│ S02              │ 16542 │
+│ S05              │ 15398 │
+╰──────────────────┴───────╯```
+
+TODO 4b. (Combines WHERE and HAVING in one query.) She then narrows it: "Just the electric bikes, just October, and don't show me anything with fewer than 300." Return start_station_id and the trip count for electric-bike trips that started in October 2025, keeping only stations with 300 or more such trips, busiest first. Use the half-open date pattern from Module 7.
+```sqlite> SELECT start_station_id, COUNT(*) AS trips
+   ...> FROM trips
+   ...> WHERE bike_type = 'electric'
+   ...>   AND start_time >= '2025-10-01'
+   ...>   AND start_time < '2025-11-01'
+   ...> GROUP BY start_station_id
+   ...> HAVING COUNT(*) >= 300
+   ...> ORDER BY trips DESC;
+╭──────────────────┬───────╮
+│ start_station_id │ trips │
+╞══════════════════╪═══════╡
+│ S08              │   812 │
+│ S06              │   808 │
+│ S01              │   691 │
+│ S11              │   573 │
+│ S02              │   552 │
+│ S05              │   454 │
+│ S07              │   419 │
+│ S09              │   405 │
+│ S04              │   390 │
+│ S03              │   323 │
+╰──────────────────┴───────╯```
+
+TODO 4c. Return each month and its trip count, keeping only the months with more than 25,000 trips. Paste the full result.
+```sqlite> SELECT strftime('%m', start_time) AS month, COUNT(*) AS trips
+   ...> FROM trips
+   ...> GROUP BY strftime('%m', start_time)
+   ...> HAVING COUNT(*) > 25000
+   ...> ORDER BY month;
+╭───────┬───────╮
+│ month │ trips │
+╞═══════╪═══════╡
+│ '04'  │ 25597 │
+│ '05'  │ 29843 │
+│ '06'  │ 31528 │
+│ '07'  │ 27134 │
+╰───────┴───────╯```
+
+TODO 4d. Take your 4c query and move the HAVING condition into a WHERE clause instead; WHERE COUNT(*) > 25000. Run it and paste exactly what your tool says.
+```sqlite> SELECT strftime('%m', start_time) AS month, COUNT(*) AS trips
+   ...> FROM trips
+   ...> GROUP BY strftime('%m', start_time)
+   ...> WHERE COUNT(*) > 25000 
+   ...> ORDER BY month;
+Parse error near line 169: near "WHERE": syntax error
+  ps FROM trips GROUP BY strftime('%m', start_time) WHERE COUNT(*) > 25000 ORDER
+                                      error here ---^```
+
+Q4e: Explain the 4d error using the logical evaluation order from the Module 8 slides. Your answer must say whenWHERE runs relative to GROUP BY.
+```WHERE runs before GROUP BY in SQLite evaluation order, therefore it filters individual rows before groups and their counts exist. However, since COUNT(*) is an aggregate calculated over groups, it isn’t available in WHERE. That's why we use HAVING to filter grouped results instead.```
+
+Q4f: In 4b, one condition filters trips and the other filters stations. Say which is which. Then explain why moving the bike_type condition from WHERE into HAVING would be a bad idea even in a case where it returned the same answer.
+```In 4b, WHERE `bike_type` = 'electric' filters individual trips before grouping while HAVING COUNT(*) >= 300 filters station groups after counting their trips. So, moving the bike-type condition to HAVING is a bad idea because it filters the groups rather than trips which could give correct row values in some instances, but in essence it could include non-electric trips.```
+
+Part 5: JOIN; Crossing the Gap Between Tables (12 pts)
+
+Save these in queries/part5.sql.
+
+TODO 5a. (Combines JOIN with WHERE and ORDER BY; a combination the slides never showed together.) Return trip_id, start_time, station_name, and docks for trips that started at a station in the Old City or Fort Sanders neighborhood, on an electric bike, oldest first. Paste the row count and the first 5 rows.
+```sqlite> SELECT
+   ...>     t.trip_id,
+   ...>     t.start_time,
+   ...>     s.station_name,
+   ...>     s.docks
+   ...> FROM trips t
+   ...> JOIN stations s ON t.start_station_id = s.station_id
+   ...> WHERE s.neighborhood IN ('Old City', 'Fort Sanders')
+   ...>   AND t.bike_type = 'electric'
+   ...> ORDER BY t.start_time ASC 
+   ...> LIMIT 5;
+╭──────────┬─────────────────────┬───────────────────────────┬───────╮
+│ trip_id  │     start_time      │       station_name        │ docks │
+╞══════════╪═════════════════════╪═══════════════════════════╪═══════╡
+│ T0094124 │ 2025-01-01 01:19:33 │ Old City - Jackson Ave    │    16 │
+│ T0158367 │ 2025-01-01 06:14:57 │ Cumberland Ave & 17th St  │    16 │
+│ T0115606 │ 2025-01-01 07:49:31 │ Fort Sanders - Laurel Ave │    12 │
+│ T0051723 │ 2025-01-01 08:28:33 │ Fort Sanders - Laurel Ave │    12 │
+│ T0139613 │ 2025-01-01 08:46:28 │ Old City - Jackson Ave    │    16 │
+╰──────────┴─────────────────────┴───────────────────────────┴───────╯```
+```sqlite> SELECT COUNT(*) AS row_count
+   ...> FROM trips t
+   ...> JOIN stations s ON t.start_station_id = s.station_id
+   ...> WHERE s.neighborhood IN ('Old City', 'Fort Sanders')
+   ...>   AND t.bike_type = 'electric';
+╭───────────╮
+│ row_count │
+╞═══════════╡
+│     16312 │
+╰───────────╯```
+TODO 5b. Count the rows returned by an inner join of trips to stations on end_station_id. Paste the count. (Class joined on start_station_id and lost 263 rows; this is the other key, and the number you lose is different.)
+```sqlite> SELECT COUNT(*) AS joined_rows
+   ...> FROM trips t
+   ...> INNER JOIN stations s ON t.end_station_id = s.station_id;
+╭─────────────╮
+│ joined_rows │
+╞═════════════╡
+│      246233 │
+╰─────────────╯```
+
+TODO 5c. (Combines JOIN with GROUP BY and an aggregate.) The ops lead wants to stop thinking in individual docks: return neighborhood, the trip count, and the average trip duration in minutes rounded to 1, one row per neighborhood, busiest first. The grouping column lives in stations; the trips live in trips. (Class grouped a joined result by station; this groups one level up.)
+```sqlite> SELECT
+   ...>     s.neighborhood,
+   ...>     COUNT(*) AS trips,
+   ...>     ROUND(
+(x1...>         AVG((julianday(t.end_time) - julianday(t.start_time)) * 1440),
+(x1...>         1
+(x1...>     ) AS avg_min
+   ...> FROM trips t
+   ...> JOIN stations s ON t.start_station_id = s.station_id
+   ...> WHERE (julianday(t.end_time) - julianday(t.start_time)) * 1440
+   ...>       BETWEEN 1 AND 1440
+   ...> GROUP BY s.neighborhood
+   ...> ORDER BY trips DESC;
+╭───────────────────┬───────┬─────────╮
+│   neighborhood    │ trips │ avg_min │
+╞═══════════════════╪═══════╪═════════╡
+│ UT Campus         │ 77564 │    16.9 │
+│ Downtown          │ 49431 │    16.9 │
+│ Fort Sanders      │ 28196 │    17.0 │
+│ World's Fair Park │ 21329 │    17.0 │
+│ North Knoxville   │ 16934 │    16.8 │
+│ South Knoxville   │ 16221 │    16.9 │
+│ Old City          │ 14157 │    17.0 │
+│ UT Ag Campus      │  7206 │    17.0 │
+│ West Knoxville    │  6594 │    16.6 │
+│ East Knoxville    │  6338 │    16.8 │
+│ Bearden           │  2077 │    16.6 │
+│ Sequoyah Hills    │  1920 │    17.4 │
+╰───────────────────┴───────┴─────────╯```
+
+Q5d: How many rows did 5b lose compared with the 250,000 in trips? Explain both reasons rows disappeared; they are not the same reason, and one of them did not apply when class joined on start_station_id.
+```5b lost the 3767 because an INNER JOIN on end_station_id excludes rows where that value is NULL, because they cannot match a station ID.```
+
+Q5e: In 5a and 5c you wrote t. and s. in front of every column. Pick one column that would be ambiguous without its prefix and say what the database would do with it.
+
+```station_id would be ambiguous because both `trips` and `stations` have a column with that name, therefore, using it without a table prefix in a query joining those tables, the database would report 'column error'.```
+
+Q5f: After 5a runs, is station_name stored anywhere in the trips table? Explain in one or two sentences what the join actually did, and why that is the point of keeping the two tables separate.
+```No, station_name is stored in stations, not in trips, rather, the join matched each trip’s start_station_id to the corresponding station row and returned that station’s name alongside the trip data. Keeping the tables separate avoids repeating station details in every trip row and prevents unintended errors.```
+
+Part 6: LEFT JOIN & Join Pitfalls (12 pts)
+
+Save these in queries/part6.sql.
+
+TODO 6a. Use the left-join-then-keep-the-failures pattern to find every trip whose end_station_id has no matching row in stations. Return the end_station_id value and a count, grouped. Paste the result. (Class ran this on start_station_id and found S99; the end-station answer looks different, and that difference is the point.)
+```sqlite> SELECT t.end_station_id, COUNT(*) AS trips
+   ...> FROM trips t
+   ...> LEFT JOIN stations s ON t.end_station_id = s.station_id
+   ...> WHERE s.station_id IS NULL
+   ...> GROUP BY t.end_station_id
+   ...> ORDER BY trips DESC;
+╭────────────────┬───────╮
+│ end_station_id │ trips │
+╞════════════════╪═══════╡
+│ NULL           │  3767 │
+╰────────────────┴───────╯```
+
+TODO 6b. Confirm that stations is safe to join against: write the check that would reveal duplicate station names, and paste its result. (Class checked station_id; a primary key can't repeat, so checking the name is the version that could actually find something.)
+```sqlite> SELECT COUNT(*) AS null_station_names
+   ...> FROM stations
+   ...> WHERE station_name IS NULL;
+╭────────────────────╮
+│ null_station_names │
+╞════════════════════╡
+│                  0 │
+╰────────────────────╯```
+
+TODO 6c. (The ON-vs-WHERE pitfall.) The ops lead is investigating late-night lighting. She wants, for all 24 stations, the number of trips that started in January 2025 between 2:00 AM and 4:59 AM; including any station where the answer is zero. Write it two ways:
+•	Version 1: put the January and hour conditions in the WHERE clause.
+```sqlite> SELECT COUNT(*) AS rows_returned
+   ...> FROM (
+   ...>     SELECT s.station_id
+   ...>     FROM stations s
+   ...>     LEFT JOIN trips t ON t.start_station_id = s.station_id
+   ...>     WHERE t.start_time >= '2025-01-01'
+   ...>       AND t.start_time < '2025-02-01'
+   ...>       AND strftime('%H', t.start_time) BETWEEN '02' AND '04'
+   ...>     GROUP BY s.station_id
+   ...> );
+╭───────────────╮
+│ rows_returned │
+╞═══════════════╡
+│            22 │
+╰───────────────╯```
+
+•	Version 2: put those same conditions in the ON clause of the LEFT JOIN.
+Paste both results, each with its row count.
+```sqlite> SELECT COUNT(*) AS rows_returned
+   ...> FROM (
+(x1...>     SELECT s.station_id
+(x1...>     FROM stations s
+(x1...>     LEFT JOIN trips t
+(x1...>       ON t.start_station_id = s.station_id
+(x1...>      AND t.start_time >= '2025-01-01'
+(x1...>      AND t.start_time < '2025-02-01'
+(x1...>      AND strftime('%H', t.start_time) BETWEEN '02' AND '04'
+(x1...>     GROUP BY s.station_id
+(x1...> );
+╭───────────────╮
+│ rows_returned │
+╞═══════════════╡
+│            24 │
+╰───────────────╯```
+
+TODO 6d. (Combines LEFT JOIN with HAVING; not combined in class.) Using whichever of 6c's versions is correct, return only the stations whose late-night count is fewer than 2, showing station_name, neighborhood, and the count, quietest first.
+```sqlite> SELECT
+   ...>     s.station_name,
+   ...>     s.neighborhood,
+   ...>     COUNT(t.trip_id) AS trips
+   ...> FROM stations s
+   ...> LEFT JOIN trips t
+   ...>   ON t.start_station_id = s.station_id
+   ...>  AND t.start_time >= '2025-01-01'
+   ...>  AND t.start_time < '2025-02-01'
+   ...>  AND strftime('%H', t.start_time) BETWEEN '02' AND '04'
+   ...> GROUP BY s.station_id, s.station_name, s.neighborhood
+   ...> HAVING COUNT(t.trip_id) < 2
+   ...> ORDER BY trips ASC, s.station_name;
+╭───────────────────────────┬───────────────────┬───────╮
+│       station_name        │   neighborhood    │ trips │
+╞═══════════════════════════╪═══════════════════╪═══════╡
+│ Sequoyah Hills Park       │ Sequoyah Hills    │     0 │
+│ Suttree Landing Park      │ South Knoxville   │     0 │
+│ Ag Campus - Morgan Hall   │ UT Ag Campus      │     1 │
+│ Bearden - Kingston Pike   │ Bearden           │     1 │
+│ Broadway & Central        │ North Knoxville   │     1 │
+│ Fort Sanders - Laurel Ave │ Fort Sanders      │     1 │
+│ Fourth & Gill             │ North Knoxville   │     1 │
+│ Happy Holler              │ North Knoxville   │     1 │
+│ Second Creek Greenway     │ World's Fair Park │     1 │
+│ South Waterfront          │ South Knoxville   │     1 │
+╰───────────────────────────┴───────────────────┴───────╯```
+
+Q6e: Version 1 and Version 2 of 6c return a different number of rows. Say which number is right for the ops lead's question, and explain the mechanism that lost the missing rows; your answer must use the word unknown.
+```Version 2 with 24 rows is the right answer because it includes all matching stations even those with zero trips as opposed to Version 1 that uses WHERE clause that runs after the LEFT JOIN and filters out the unmatched rows (trip columns are NULL, so the date and hour conditions evaluate as unknown or not true).```
+
+Q6f: In 6c you counted with COUNT(t.trip_id) rather than COUNT(*). Explain what COUNT(*) would have reported for a station with no matching trips, and why.
+```Stations with no matching trips would report 1 if COUNT(*) is used since LEFT JOIN still produces one row for that specific station, with NULL values in the trip columns. On the other hand, COUNT(t.trip_id) reports 0 because it ignores NULL values.```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # DATA 501 Assignment 7 SQL Log
 
 **Name:*Charles Munga Muiruri*
