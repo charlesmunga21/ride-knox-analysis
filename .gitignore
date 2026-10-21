@@ -7,3 +7,7 @@ ride_knox_api_token.txt
 .ipynb_checkpoints/
 ~$*
 ride-knox-queries/ride_knox.db
+
+# SQL module project: build products + new raw export
+*.db
+trips_2026_07.csv
