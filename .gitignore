@@ -7,3 +7,5 @@ ride_knox_api_token.txt
 .ipynb_checkpoints/
 ~$*
 ride-knox-queries/ride_knox.db
+/ride_knox_v2.db
+/trips_2026_07.csv
