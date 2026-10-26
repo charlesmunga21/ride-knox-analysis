@@ -10,3 +10,7 @@ ride-knox-queries/ride_knox.db
 /ride_knox_v2.db
 /trips_2026_07.csv
 /out/
+
+# SQL module project: build products + new raw export
+*.db
+trips_2026_07.csv
