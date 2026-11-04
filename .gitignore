@@ -11,6 +11,11 @@ ride-knox-queries/ride_knox.db
 /trips_2026_07.csv
 /out/
 
+# Assignment 11: pipeline run artifacts, never committed
+/logs/
+.env
+.venv/
+
 # SQL module project: build products + new raw export
 *.db
 trips_2026_07.csv

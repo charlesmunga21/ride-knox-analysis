@@ -111,3 +111,27 @@ _config.yml
   recovery holds outside the spring/summer season this data covers.
 - Bearden's per-dock use doubled in H1 2026 but is still last of 25 stations in absolute
   terms — worth watching before committing to a relocation.
+
+## Monday briefing
+
+```
+cp .env.example .env            # fill in RIDE_KNOX_API_KEY once
+export $(grep -v '^#' .env | xargs)
+source .venv/bin/activate
+./pipeline/run_briefing.sh 2025
+```
+
+**Inputs:** `trips_2025.csv`, `stations.xlsx`, `ride_knox.db` (not in this repo; copy them
+into the repo root before running), plus the `RIDE_KNOX_API_KEY` environment variable.
+
+**Outputs:** `out/station_pressure.csv`, `pipeline/latest_summary.txt` (committed),
+`logs/briefing.log`.
+
+**Safe to re-run:** yes. Every stage overwrites its output with `>`/`.once` rather than
+appending, and the station-pressure query recomputes from `ride_knox.db` each time, so
+running it twice in a row produces byte-identical results — there is nothing to
+double-count.
+
+**Fails if:** `trips_2025.csv` is missing or has more than `RIDE_KNOX_MAX_DUPES`
+(default 1,000) duplicate rows, `RIDE_KNOX_API_KEY` is unset, or `ride_knox.db` does not
+exist for the `sqlite3` stage.
