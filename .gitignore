@@ -19,3 +19,17 @@ ride-knox-queries/ride_knox.db
 # SQL module project: build products + new raw export
 *.db
 trips_2026_07.csv
+
+/fig/
+
+# Local/editor and scratch files
+.DS_Store
+/.vscode/settings.json
+/ANALYSIS
+
+# Assignment 12: R session files and generated figures
+.Rhistory
+.RData
+.Rproj.user/
+Rplots.pdf
+/figs/
