@@ -5,7 +5,6 @@
 **R version:** R version 4.5.2 (2025-10-31)
 **tidyverse version:** tidyverse 2.0.0 (dplyr 1.2.1, readr 2.2.0, ggplot2 4.0.3)
 
-All code below is from `fleet_pressure.R`, run top to bottom from the project root. Output is pasted underneath each command as the console printed it.
 
 ## Part 0
 TODO 0a. In RStudio, File → New Project, and create (or open) a project in your ride-knox-analysis folder. Create fleet_pressure.R and a figs/ folder. Paste the output of getwd() and say in one line why you did not have to type a full path to your data.
@@ -14,7 +13,6 @@ TODO 0a. In RStudio, File → New Project, and create (or open) a project in you
 > getwd()
 [1] "/Users/charlesmunga/Desktop/ride-knox-clone"
 ```
-The `.Rproj` file (`ride-knox-clone.Rproj`) sets the working directory to the project folder itself, so `read_csv("trips_2025.csv")` finds the file with a relative path.
 
 TODO 0b. Put library(tidyverse) and library(readxl) at the top of fleet_pressure.R and run them. Paste the startup message. Record R.version.string and your tidyverse version at the top of ANALYSIS-LOG.md.
 
@@ -37,7 +35,7 @@ TODO 0b. Put library(tidyverse) and library(readxl) at the top of fleet_pressure
 
 TODO 0c. Run the class warm-up unchanged: count(trips, rider_type, sort = TRUE) on the freshly read file, and paste all six rows. (You will need read_csv() first; that's Part 2a; do it now and reference it there.)
 
-`trips` was read with `read_csv()` first (see Part 2a).
+`trips` read with `read_csv()` as in Part 2a.
 ```r
 > count(trips, rider_type, sort = TRUE)
 # A tibble: 6 × 2
@@ -53,10 +51,10 @@ TODO 0c. Run the class warm-up unchanged: count(trips, rider_type, sort = TRUE) 
 
 Q0d: A classmate's script opens with install.packages("tidyverse") so that "it works on any machine." Give the two separate reasons the slides reject this, and name where that line belongs instead.
 
-1. **Install once, load every time.** A package only needs installing once per machine. Putting the install in the script re-downloads and reinstalls tidyverse every time anyone sources it.
-2. **Reproducibility (Module 11's rule).** A script should analyse data, not change the machine it runs on. A script that installs packages silently alters the reader's environment and can break when there is no network.
+1. Install once, load every time: A package only needs installing once per machine and thus, putting the install in the script re-downloads and reinstalls tidyverse every time anyone sources it.
+2. Reproducibility: A script should analyse data, not change the machine it runs on. A script that installs packages alters the reader's environment and can break when there is no network.
 
-The line belongs in the **console**, run once. The script only carries `library()` calls at the top.
+The line belongs in the console and is only run once per machine. The script only carries `library()` calls at the top.
 
 ## Part 1
 The ops lead's van serves the three North Knoxville stations, which have 12, 10, and 12 docks.
@@ -75,7 +73,7 @@ TODO 1a. Build a vector called north_docks holding those three values. Report it
 function (..., na.rm = FALSE) 
 NULL
 ```
-I confirmed `sum()` with the help system from the setup slide. `args(sum)` shows it takes any number of values (`...`) and returns their total, and `?sum` opens the same help page.
+I confirmed `sum()` with the help system from the setup slide and `args(sum)` shows it takes any number of values (`...`) and returns their total, and `?sum` opens the same help page.
 
 TODO 1b. Compute each station's share of the van's total capacity, as a percentage, in one expression and with no loop. Then pull out the first element of your result with [ ].
 
@@ -99,7 +97,7 @@ Two of the three North Knoxville stations (66.7%) have more than 10 docks.
 
 Q1d: 1c is a shortcut you will use again in Part 5. Explain, in terms of what mean() does to a vector of TRUE/FALSE, why mean(x > 10) gives you a proportion rather than an average dock count.
 
-`x > 10` returns a logical vector, not dock counts. `mean()` coerces TRUE to 1 and FALSE to 0, so it computes (number of TRUEs) / length. That is the share of elements meeting the condition: a proportion between 0 and 1, not an average of dock values.
+`x > 10` returns a logical vector, not dock counts. `mean()` coerces TRUE to 1 and FALSE to 0, so it computes (number of TRUEs) / length. That is the share of elements meeting the condition and in our case, 2 0f 3: a proportion between 0 and 1, not an average of dock values.
 
 ## Part 2
 TODO 2a. Read both raw files into trips and stations. Paste the full column-specification message read_csv() prints.
@@ -165,15 +163,15 @@ dttm (2): start_time, end_time
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 [1] 121
 ```
-By default readr stripped the leading and trailing whitespace from every field as it read the file. 48 station-name variants that differed only by stray spaces were merged before I ever saw them. That is a cleaning step done silently on import.
+`readr` stripped the leading and trailing whitespace from every field as it read the file. The station-name variants that differed by stray spaces were merged at import before they made it to the console.
 
 Q2e: Name the two columns read_csv() typed as <dttm>, and state one specific thing in Part 4 that would break if those had come in as <chr> instead.
 
-`start_time` and `end_time`. If `start_time` were `<chr>`, `month(start_time, label = TRUE)` and `hour(start_time)` in Part 4 would have no date-time to extract from, so `month` and `hour` would not be built. (The `difftime()` that makes `duration_min` in Part 3 would fail too.)
+`start_time` and `end_time`. If `start_time` were `<chr>`, `month(start_time, label = TRUE)` and `hour(start_time)` in Part 4 would have no date-time to extract from, so `month` and `hour` would not be built. It would not be possible to calculate the durations of the trips.
 
 Q2f: stations has 24 rows and trips has 250,600. Using the vocabulary table from class, name what each of those two objects is called in R and what a single column of one is called.
 
-Both are **tibbles** (the tidyverse's data frame, pandas' DataFrame). A single column of either is a **vector** (pandas' Series).
+Both are `tibbles` in R as they are pandas' DataFrame. A single column of either is a `vector` as in pandas' Series.
 
 ## Part 3
 Build the cleaned dataset as a single piped pipeline assigned to clean. Apply, in order: distinct(); evict S99 from start_station_id and from end_station_id without losing trips whose end station is missing; lowercase and trim rider_type; add a duration_min column; and keep only trips of 1 to 1440 minutes.
@@ -215,7 +213,7 @@ TODO 3c. Now count the one-way trips the obvious way: filter(end_station_id != s
 
 TODO 3d. Your 3b and 3c counts do not add up to 247,967. Report the gap and explain in one sentence what R did. Then decide where those missing trips belong: either keep 3c's number as the one-way count and give them a category of their own, or fold them in with the non-round-trips using a corrected filter(). State which you chose and why, and paste the code and number for both readings.
 
-Gap: 247,967 − (30,112 + 214,129) = **3,726**. For a trip with no end station, `end_station_id != start_station_id` evaluates to `NA`, and `filter()` keeps only rows that are TRUE, so R dropped those trips without warning.
+Gap: 247,967 − (30,112 + 214,129) = 3,726. For a trip with no end station, `end_station_id != start_station_id` evaluates to `NA`, and `filter()` keeps only rows that are TRUE, so R dropped those trips.
 
 Reading 1: keep 3c as one-way and give the missing ends their own category.
 ```r
@@ -231,26 +229,25 @@ Reading 2: fold them into the non-round-trips with a corrected filter.
 +   nrow()
 [1] 217855
 ```
-**My choice: Reading 2 (fold in, 217,855).** The question the ops lead asked was "how many trips returned to the station they left from?" A trip with no recorded end did not demonstrably return, and from the departure dock's point of view the bike left and did not come back, which is exactly the one-way effect on her inventory. 30,112 + 217,855 = 247,967.
+Reading 2, fold in, to get 217,855:Since the question the ops lead asked was "how many trips returned to the station they left from?" A trip with no recorded end did not return, and from the departure dock's point of view the bike left and did not come back, which is the one-way effect on her inventory that gives 30,112 + 217,855 = 247,967.
 
 TODO 3e. Report the three-way decomposition; one-way, round trip, and end unknown; and show that the three add to nrow(clean) exactly.
-
+```
 | Category | Trips | Source |
 |---|---:|---|
 | One-way (known, different end) | 214,129 | 3c |
 | Round trip | 30,112 | 3b |
 | End unknown | 3,726 | 3d |
-| **Total** | **247,967** | = `nrow(clean)` |
-
-214,129 + 30,112 + 3,726 = 247,967, exactly `nrow(clean)`.
+| Total | 247,967 | = `nrow(clean)` |
+```
 
 Q3f: Class hit this same trap on a different comparison. In one or two sentences, state the general rule about NA inside filter() that covers both cases, and say why a student who only ever tested their pipeline against a row count would never find it.
 
-Any comparison involving `NA` (`!=`, `==`, `>`) returns `NA`, not TRUE or FALSE, and `filter()` silently drops every row that is not TRUE. So a condition on a column with missing values must say `is.na(x) | …` explicitly. A row-count check never catches it because the wrong answer is still a plausible smaller number with no error: class's 246,233 and my 214,129 both look like reasonable counts unless you reconcile the pieces against the whole.
+Any comparison involving `NA` (`!=`, `==`, `>`) returns `NA`, not TRUE or FALSE, and `filter()` silently drops every row that is not TRUE. Therefore, a condition on a column with missing values must explicitly say `is.na(x) | …`. A row-count check never catches it because the wrong answer still looks plausible with no error.
 
 Q3g: Your 3d fix keeps trips with no end station in the "one-way" group. Argue against your own choice: give one reason the ops lead might want those 3,726 trips in a category of their own instead.
 
-A trip with no recorded end may be a bike that was never docked: lost, stolen, abandoned, or a dock that failed to register it. That is a recovery and maintenance job for her crew, not a rebalancing job. Folding 3,726 of them into "one-way" hides how many bikes she may need to go and find.
+A trip with no recorded end may be a bike that was never docked meaning it got lost, stolen, abandoned, or a dock that failed to register it. That is a recovery and maintenance job for her crew and not a rebalancing job. Folding 3,726 of them into "one-way" hides how many bikes she may need to go and find.
 
 ## Part 4
 Part 3 gave you duration_min. This week's figures need two more time features.
@@ -280,11 +277,11 @@ TODO 4b. In a second mutate(), add is_evening, which is TRUE when hour is 16 or 
 
 Q4c: You created month as a labelled month rather than a number. Name the specific thing this buys you in Part 7, and what your x-axis would have done without it.
 
-`month(start_time, label = TRUE)` returns an **ordered factor**, so Figure 1's x-axis is discrete, labelled Jan–Dec, and sorted in calendar order with no extra work. As a plain number the axis would be continuous, with ticks at 2.5, 5, 7.5, 10 and no month names. As text it would sort alphabetically (Apr, Aug, Dec, …).
+`month(start_time, label = TRUE)` returns an *ordered factor* in form of months labelled Jan–Dec in the x axis sorted in calendar order. As a plain number the x axis would be continuous just like the y axis holding the trips and it would be harder for somebody else to interpret the figure without month names. Now, the month text is sorted in ascending alphabetical order.
 
 Q4d: 4a and 4b could have been one mutate() call instead of two; is_evening depends on hour, which 4a creates. State the rule from class that makes the single-call version legal, then give one reason a reviewer might still prefer you had written it as two.
 
-The rule: inside one `mutate()`, later expressions can use columns created by earlier expressions in the same call. A reviewer might still prefer two calls because each step does one job: the raw time features first, then a derived flag with a judgment call in it (the 16:00 threshold). That makes the threshold easy to find, check, and change without touching the feature extraction.
+The rule: inside one `mutate()`, later expressions can use columns created by earlier expressions in the same call. A reviewer might still prefer two calls because each step does one separate and unique job: 4a creates the raw time features first, then 4b derived the 16:00 threshold. That makes the threshold easy to find, check, and change without touching the feature extraction.
 
 ## Part 5
 Class counted trips per month per rider type. The ops lead does not care about counts; she cares about mix: what fraction of the bikes going out are being taken by casual riders.
@@ -331,16 +328,16 @@ TODO 5c. Report the percentage-point drop in casual_pct from June to July, and s
 > mix$median_min[6] - mix$median_min[12]
 [1] 1.4
 ```
-Casual share dropped **10.4 percentage points** from June (44.2%) to July (33.8%). Median trip length dropped **1.4 minutes** from June (14.2) to December (12.8).
+Casual share dropped 10.4% from June (44.2%) to July (33.8%). Median trip length dropped 1.4 minutes from June (14.2) to December (12.8).
 
 Q5d: Class charted casual trips as a count and found a cliff. You just measured the same period as a share. Name one thing the share shows that the count cannot, and one thing the count shows that the share cannot.
 
-- **The share shows** that the casual decline is not just seasonal. Total trips also fall in winter, but casual riders keep losing ground relative to members every month after July (33.8% → 22.7%), which a raw count mixes up with winter.
-- **The count shows** volume: how many bikes are actually out (31,279 trips in June vs 10,244 in December). It also shows whether casual riders fell or members rose. A share can drop for either reason, and only the count tells you which.
+- The share shows the casual riders' decline trend relative to the member riders. It clearly shows how the two rider groups varied across the months during the year upto and after the price shifts. It cannot show total trips or volumes.
+- The count on the other shows trips volume and trip share of each rider group. It cannot capture the monthly ridership share in terms of casual or member riders as the share above (only their trip shares). 
 
 Q5e: Your median_min falls steadily across the year, but nothing about any individual rider's habits changed. Using your own casual_pct column and the class figure that casual trips run about 19.0 minutes against a member's 11.6, explain the fall in two or three sentences. Name what this kind of effect is doing to the overall median.
 
-Casual trips (median ≈ 19.0 min) made up 44.2% of June's trips but only 22.7% of December's. The pool shifted toward member trips (≈ 11.6 min), so the overall median slides down toward the member median even if every rider kept exactly the same habits. This is a **composition (mix) effect**: the overall median is tracking the changing share of each population, not a change in behaviour within either group.
+Casual trips (median about 19.0 min) made up 44.2% of June's trips but only 22.7% of December's. This means that the trips durations shifted toward member trips (about 11.6 min), causing the overall median to slide down toward the member median even though every rider kept exactly the same habits. 
 
 ## Part 6
 Class joined on start_station_id and ranked departures. The van goes where bikes arrive.
@@ -367,7 +364,7 @@ TODO 6a. Count arrivals per station from clean using end_station_id, name the co
   <chr>             <int>
 1 <NA>               3726
 ```
-The count has 25 groups for 24 stations. The extra one is **`NA`**: the **3,726** trips with no recorded end station.
+The count has 25 groups for 24 stations. The extra one is `NA` for the 3,726 trips with no recorded end station.
 
 TODO 6b. Drop that non-station group, then left_join() to stations on the appropriate key pair, add arrivals_per_dock(rounded), and arrange() so the most-pressured station is first.
 
@@ -399,7 +396,7 @@ TODO 6c. Paste the top 5 and bottom 3 rows, showing station name, neighborhood, 
 > per_dock$arrivals_per_dock[1] / per_dock$arrivals_per_dock[24]
 [1] 6.747126
 ```
-Cumberland Ave & 17th St (1,174 arrivals per dock) takes **6.7×** the arrivals per dock of Bearden – Kingston Pike (174).
+Cumberland Ave & 17th St (1,174 arrivals per dock) takes 6.7 times the arrivals per dock of Bearden – Kingston Pike (174).
 
 TODO 6d. Total your arrivals column and compare it to nrow(clean). Report both numbers and the difference, and reconcile that difference against a number you already produced in Part 3.
 
@@ -411,12 +408,12 @@ TODO 6d. Total your arrivals column and compare it to nrow(clean). Report both n
 > nrow(clean) - sum(per_dock$arrivals)
 [1] 3726
 ```
-Arrivals total **244,241** (the anchor) against **247,967** clean trips. The difference, **3,726**, is exactly the "end unknown" count from 3d/3e: those trips departed but never arrived anywhere recorded.
+Arrivals total 244,241 against 247,967 clean trips. The difference of 3,726 is the "end unknown" count with missing end_station_id.
 
 Q6e: Class ranked departures and got a top station of about 1,175 trips per dock. Your arrivals ranking lands within a few points of that. Name one operational question that the arrival ranking answers and the departure ranking does not; and one reason an annual total of either might still send the van to the wrong place. (The second half is a limitation the slides raised about annual aggregates.)
 
-- **The arrival ranking answers:** "Where do docks fill up so a rider can't return a bike, and where must the van go to pull bikes out?" Departures tell you where docks empty out, which is the opposite job.
-- **Annual totals can still mislead** because they hide timing. A dock can be nearly balanced over the year yet overflow every weekday at 5pm and empty every morning, and the year also mixes June's casual-heavy traffic with December's member-only traffic. The van needs the imbalance by hour and day, not by year.
+- The arrival ranking answers where the docks fill up so a rider can't return a bike and stations where the van must go to pull bikes out. Departures tell us where docks empty out, which is the opposite of what the arrivals indicate.
+- Annual totals can still mislead because they hide temporal trends within the season, months and days. A dock can be nearly balanced over the year yet overflow every weekday at 5pm and empty every morning.
 
 ## Part 7
 Your first figure, and the one the ops lead will read first.
@@ -452,16 +449,15 @@ TODO 7b–7e. Line chart of casual_pct by month with points, dashed July 1 line 
 > 
 > print(fig1)
 ```
-- `group = 1` is needed because `month` is a factor.
-- `xintercept = 6.5` sits between Jun and Jul on the discrete axis.
-- `limits = c(0, NA)` pins the baseline at zero.
-- `x = NULL` deletes a label that earns nothing.
-
-**Figure description:** a single orange line holds flat at 43–45% casual share from January to June, then drops sharply across the dashed July 1 line to 33.8% and keeps sliding every month to 22.7% in December, on a y-axis that starts at zero.
+--- `group = 1` is needed because `month` is a factor.
+--- `xintercept = 6.5` sits between Jun and Jul on the discrete axis.
+--- `limits = c(0, NA)` pins the baseline at zero.
+--- `x = NULL` deletes a label that earns nothing.
 
 Q7f: You pinned the y-axis at zero. Suppose you instead let it start at 20. Describe what would happen to the apparent size of the July drop, and say whether that would be one of the crimes on the class ledger; the answer is not the obvious one, and your reasoning matters more than your verdict.
 
-Starting at 20 stretches the data across a range of about 20–45 instead of 0–45. The 10.4-point June→July drop would fill about 40% of the plot height instead of about 23%, and the December value (22.7%) would sit near the floor, as if casual riding had almost vanished. **Strictly, it is not the ledger crime.** "Truncated bar axis" is a crime because bar length encodes the value. A line encodes position and change, so a non-zero baseline on a line chart can be legitimate when the change is the story. It still exaggerates the drop visually for a reader six feet away. By the ledger's own rule ("defensible if you say it out loud, never silently"), I'd only do it with the axis start announced. For a share chart the ops lead reads at a glance, zero is the honest choice.
+Starting at 20% instead of 0 stretches the data across a range of about 20 to 45 (25 points) instead of 0–45 (45 points). The 10.4-point June→July drop would fill about 40% of the plot height instead of about 23%, and the December value (22.7%) would sit near the floor (since new zero would be 20), as if casual riding had almost vanished. 
+Strictly, it is not the ledger crime especially if it is explicitly stated. A line encodes position and change, so a non-zero baseline on a line chart can be legitimate when the change is the story. It still exaggerates the drop visually for a reader so I'd only do it with the axis start announced. For a share chart the ops lead reads at a glance, zero is the better honest choice.
 
 ## Part 8
 TODO 8a–8c. Horizontal bar chart of arrivals_per_dock, ordered by value, fill mapped to neighborhood with a colourblind-safe scale, thousands separators, labelled and themed.
@@ -485,10 +481,10 @@ TODO 8a–8c. Horizontal bar chart of arrivals_per_dock, ordered by value, fill 
 > 
 > print(fig2)
 ```
-- `fct_reorder()` sorts the bars by value, not alphabetically.
-- `scale_fill_viridis_d()` is the fill twin of `scale_colour_viridis_d()`.
-- `scales::comma` formats the x-axis (0 to 1,200).
-- `limits = c(0, NA)` keeps the value axis at zero.
+--- `fct_reorder()` sorts the bars by value, not alphabetically.
+--- `scale_fill_viridis_d()` is the fill twin of `scale_colour_viridis_d()`.
+--- `scales::comma` formats the x-axis (0 to 1,200).
+--- `limits = c(0, NA)` keeps the value axis at zero.
 
 Q8d: Class set fill to a constant grey and said explicitly why. You just mapped it to a variable. Justify your version in one sentence; what is fill earning here that it was not earning there?
 
@@ -496,7 +492,7 @@ Here fill carries a second variable the van actually routes by, neighborhood. It
 
 Q8e: Your chart now carries 12 fill colours. Name one concrete way this makes the figure harder to read from six feet away, and one change you would make if the ops lead complained.
 
-At six feet, neighbouring viridis shades are hard to tell apart: Fort Sanders and North Knoxville are both mid-blue, UT Campus and UT Ag Campus are both green. The reader has to match colours back to a 12-entry legend, which defeats the five-second test. **Fix:** collapse fill to two groups, the campus/downtown core in one strong colour and everything else grey ("grey the context, colour the subject").
+At six feet, neighbouring viridis shades are hard to tell apart: Fort Sanders and North Knoxville are both mid-blue, UT Campus and UT Ag Campus are both green. The reader has to match colours back to a 12-entry legend, which defeats the five-second test. The fix would be to collapse fill to two groups, the campus/downtown core in one strong colour and everything else grey.
 
 ## Part 9
 The fleet team believes electric bikes get taken on longer trips. Test it.
@@ -530,15 +526,15 @@ TODO 9b–9c. Side-by-side boxplots, outliers suppressed, zoomed (not subset), l
 > 
 > print(fig3)
 ```
-`coord_cartesian()` zooms without deleting rows, so the box statistics are still computed from all 247,967 trips. `outlier.shape = NA` hides the long-trip dots.
+---`coord_cartesian()` zooms without deleting rows, so the box statistics are still computed from all 247,967 trips. ---`outlier.shape = NA` hides the long-trip dots.
 
 Q9d: In one or two sentences, tell the fleet team what you found, in the five-second-test spirit from class.
 
-Electric bikes are **not** taken on longer trips: the median electric trip is 13.8 minutes against 13.7 for classic, and the two boxes are almost identical. Bike type does not change trip length.
+Electric bikes are not taken on longer trips: the median electric trip is 13.8 minutes against 13.7 for classic, and the two boxes are almost identical, so bike type does not change trip length.
 
 Q9e: Name the specific argument you would change in 9b to make these two boxes look meaningfully different, and say what a reader would wrongly conclude. Then name which class crime that would be.
 
-The `ylim` in `coord_cartesian(ylim = c(0, 40))`. Narrowing it to something like `c(13, 15)` would blow the 0.1-minute median gap up to a visible fraction of the plot, and the reader would wrongly conclude electric trips run meaningfully longer, confirming the fleet team's belief. That is the **truncated axis** crime: cutting the value axis so a trivial difference looks large.
+The `ylim` in `coord_cartesian(ylim = c(0, 40))`. Narrowing it to something like `c(13, 15)` would blow the 0.1-minute median gap up to a visible fraction of the plot, and the reader would wrongly conclude electric trips run meaningfully longer, confirming the fleet team's belief. That is the truncated axis crime of cutting the value axis so a trivial difference looks large.
 
 ## Part 10
 TODO 10a. Build a count of trips by hour and bike_type.
@@ -601,7 +597,7 @@ Q10d: Report each bike type's peak hour and peak count. Then state, using those 
 | classic | 17 (5pm) | 15,591 |
 | electric | 17 (5pm) | 9,366 |
 
-The free-scales version drew both 5pm peaks at the same height, telling the reader that electric demand at the peak equals classic demand. In fact the electric peak (9,366) is only **60%** of the classic peak (15,591); classic carries **1.7×** as many trips at 5pm. A reader sizing the van's electric versus classic load from that chart would be wrong by about 6,200 trips at the busiest hour.
+The free-scales version drew both 5pm peaks at the same height, telling the reader that electric demand at the peak equals classic demand. In fact the electric peak (9,366) is only 60% of the classic peak (15,591) which sees a 1.7x more classic bike use compared to electric bikes.
 
 ## Part 11
 TODO 11a. Save all four figures into figs/ with ggsave(). Use sizes suited to each chart; the 24-bar ranking is not the same shape as a 12-point line; at print resolution, and handle the background problem the slides warn about. Paste all four calls.
@@ -616,16 +612,15 @@ TODO 11a. Save all four figures into figs/ with ggsave(). Use sizes suited to ea
 > ggsave("figs/fig4_hourly_bike_type.png", plot = fig4,
 +        width = 12, height = 6, dpi = 300, bg = "white")
 ```
-- Fig 1, the 12-point line, is wide and short (10×6).
-- Fig 2, the 24-bar ranking plus a 12-entry legend, is nearly square and tall (11×10) so the station labels don't crowd.
-- Fig 3 has two boxes, so 8×6 is enough.
-- Fig 4 has two side-by-side panels, so it is extra wide (12×6).
+--- Fig 1, the 12-point line, is wide and short (10×6).
+--- Fig 2, the 24-bar ranking plus a 12-entry legend, is nearly square and tall (11×10) so the station labels don't crowd.
+--- Fig 3 has two boxes, so 8×6 is enough.
+--- Fig 4 has two side-by-side panels, so it is extra wide (12×6).
 
 All four use `dpi = 300` for print and `bg = "white"`, because `theme_minimal()` otherwise saves a transparent background.
 
 TODO 11b. Confirm fleet_pressure.R runs clean from a fresh session: Session → Restart R, then source the whole script. Paste the last few lines of console output and confirm four files landed in figs/.
 
-I deleted the old PNGs, then sourced the script in a brand-new R session:
 ```r
 > source("fleet_pressure.R")
 ...
@@ -645,41 +640,39 @@ fig2_dock_pressure.png
 fig3_duration_bike_type.png
 fig4_hourly_bike_type.png
 ```
-All four files landed in `figs/`.
 
 TODO 11c. Write the one-pager in ANALYSIS-LOG.md, addressed to the operations lead, using the five-part structure from Module 4: bottom line, evidence, interpretation labeled as interpretation, limitations, recommendation. Reference each figure by filename. 150–250 words. At least three limitations, one of which must come from a judgment call you made in Part 3 or Part 6.
 
 ### Operations One-Pager: Fleet Pressure, 2025
 **To:** Operations Lead, Ride Knox
 
-**Bottom line.** Bikes pile up at campus and downtown docks around 5pm, and the fleet is now ridden mostly by members.
+**Bottom line** Bikes pile up at campus and downtown docks around 5pm, and the fleet is now ridden mostly by members.
 
-**Evidence.**
+**Evidence**
 - Casual riders fell from 44.2% of trips in June to 22.7% in December (`figs/fig1_casual_share.png`).
 - Cumberland Ave & 17th St and The Hill – Ayres Hall each take about 1,170 arrivals per dock, 6.7× Bearden's 174 (`figs/fig2_dock_pressure.png`).
 - Electric and classic trips last the same, 13.8 vs 13.7 minutes median (`figs/fig3_duration_bike_type.png`).
 - Both bike types peak at 5pm, with classic bikes carrying 1.7× the electric volume (`figs/fig4_hourly_bike_type.png`).
 
-**Interpretation (this is interpretation, not a proven cause).** The timing points to the July 1 price increase. The riders who remain look like commuters, so dock pressure now follows the weekday commute clock.
+**Interpretation** The timing points to the July 1 price increase. The member riders who remain look like commuters, so dock pressure now follows the weekday morning and evening commute clock.
 
-**Limitations.**
+**Limitations**
 1. All rankings are annual totals; a dock can balance over the year yet overflow every weekday evening.
 2. I excluded 3,726 trips with no recorded end station from the arrival counts (Part 6). If those are undocked bikes, pressure is understated somewhere.
 3. One year of data cannot separate price from season or the campus calendar.
 4. Trips under 1 or over 1,440 minutes were removed.
 
-**Recommendation.** Stage the van at the Fort Sanders / UT Campus / Market Square cluster before 5pm on weekdays, and rerun this analysis by hour of day before changing routes.
+**Recommendation** 
+Stage the van at the Fort Sanders / UT Campus / Market Square cluster before 5pm on weekdays, and rerun this analysis by hour of day before changing routes.
 
 TODO 11d. Commit fleet_pressure.R to your repository, and add figs/ to .gitignore so the PNGs stay out. Paste git status showing a clean tree, push, and put the commit URL in your log.
-
-`/figs/` (plus `.Rhistory`, `.RData`, `.Rproj.user/`, and `Rplots.pdf`) was added to `.gitignore`.
 
 ```
 $ git status
 On branch feature/rscripting
 nothing to commit, working tree clean
 ```
-**Commit URL:** (ADD AFTER PUSH)
+**Commit URL:** at the header of the document submitted on Canvas
 
 Q11e: You just committed the script and ignored its output. State the argument for that split in one sentence, and name the one circumstance from the slides in which you would commit the generated figures anyway.
 
@@ -734,17 +727,17 @@ Largest net gain: Caswell Park (+73). Largest net loss: Hodges Library (−581).
 
 C3. The net-flow numbers in C2 are far smaller than you might expect; no station gains or loses more than a few hundred bikes across a whole year. In two or three sentences, say what that does not prove about whether the ops lead's van is needed, and name the time grain at which you would expect to find the imbalance she is actually chasing.
 
-A near-zero annual net does not prove the docks stay balanced. It only proves that the inflows and outflows cancel over 365 days. Hodges Library can gain hundreds of bikes every weekday morning and lose them every evening and still net out near zero for the year, while being full or empty at exactly the moments riders need it. The imbalance she is chasing lives at the **hour-of-day (by weekday) grain**, station × hour, where the 8am and 5pm commute peaks push bikes in one direction at a time.
+A near-zero annual net does not prove the docks stay balanced. It only proves that the inflows and outflows cancel over 365 days. Hodges Library can gain hundreds of bikes every weekday morning and lose them every evening and still net out near zero for the year, while being full or empty at exactly the moments riders need it. The imbalance she is chasing lives at the *hour-of-day (by weekday) grain*.
 
 ## Reflection
 R1. Two tasks this week had a version that ran perfectly and was wrong: the filter() in 3c, and the free-scales facet in 10c. Pick the one you would have been least likely to catch on your own, and in two or three sentences name the habit you would build to catch it next time. "Be more careful" is not a habit; name something you would actually run or check.
 
-The free-scales facet in 10c is the one I would most likely have missed. It produces a cleaner-looking chart and there is no row count to reconcile it against. My habit: before saving any faceted chart, I will print each panel's peak (`filter(...) |> arrange(desc(n))`) and check it against the tick labels of every panel. If the panels don't share one axis, the caption must say so.
+The free-scales facet in 10c is the one I would most likely have missed. It produces a cleaner-looking chart and there is no row count to reconcile it against. Before saving any faceted chart, I would print each panel's peak (`filter(...) |> arrange(desc(n))`) and check it against the tick labels of every panel. If the panels don't share one axis, the caption must say so.
 
 R2. You have now drawn the same underlying dataset in matplotlib (Module 4) and in ggplot2. In two or three sentences, name one thing that was genuinely easier here and one thing that was not, and say which tool you would reach for to sketch a chart nobody but you will see.
 
-Genuinely easier in ggplot2: mapping a column to `colour`/`fill` or splitting with `facet_wrap()` gives the legend and panels for free, and one saved `ops_theme` made all four figures siblings. Harder: the factor rules are easy to trip on silently, such as needing `group = 1` for a line over months and `fct_reorder()` to stop alphabetical bars, and `+` versus `|>` takes getting used to. For a quick sketch only I will see, I'd reach for ggplot2: `ggplot(clean, aes(x, y)) + geom_*()` is three lines with no styling needed.
+It is easier in ggplot2 to map a column to `colour`/`fill` or splitting with `facet_wrap()` which gives the legend and panels for free, and one saved `ops_theme` makes all four figures siblings. It is harder to execute spot trips in the factor rules, such as needing `group = 1` for a line over months and `fct_reorder()` to stop alphabetical bars, and `+` versus `|>` takes getting used to. For a quick sketch I'd reach for ggplot2: `ggplot(clean, aes(x, y)) + geom_*()`.
 
 R3. AI disclosure: describe any use of generative AI tools in this assignment, or state "No generative AI tools were used."
-
-I used Claude Code (Anthropic) to draft `fleet_pressure.R`, run it, and assemble this log from its console output, keeping to the commands shown in the Module 12 slides and the class demo script. I reviewed every number against the six anchors and checked each figure before submitting.
+```The ANALYSIS-LOG.md and the Git actions were all prepared in VS code without any use of regenretaive AI tools.
+R syntax such as where to add a pipe or fix a failing ggplot2 and theme selection were handled using VS Code copilot. The final code and decison to publish are my own.```
