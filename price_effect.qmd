@@ -1,0 +1,655 @@
+---
+title: "Ride Knox: Sizing the July Price Effect"
+author: "Charles Munga Muiruri (cmuiruri)"
+date: today
+format:
+  html:
+    toc: true
+    code-fold: false
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+library(tidyverse)
+library(readxl)
+library(broom)   # ships with the tidyverse, NOT attached
+```
+
+```{r}
+#| label: helpers
+#| include: false
+# Formatting helpers for inline numbers
+num <- function(x, digits = 0) format(round(x, digits), big.mark = ",", nsmall = digits)
+pp  <- function(x) num(x, 1)
+
+ops_theme <- theme_minimal(base_size = 13) +
+  theme(
+    plot.title       = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+## Part 0
+
+**TODO 0a.** The `library()` chunk sits at the top of this document (`load-packages`). It loads tidyverse, readxl and broom. Since Part 10 it carries `include: false`, so it runs without printing. The document was rendered once while empty, and `price_effect.html` appeared next to the `.qmd`.
+
+**TODO 0b.** Versions:
+
+```{r}
+#| label: versions
+R.version.string
+
+quarto_bin <- Sys.getenv("QUARTO_BIN_PATH")
+quarto_exe <- if (nzchar(quarto_bin)) file.path(quarto_bin, "quarto") else "quarto"
+system2(quarto_exe, "--version", stdout = TRUE)
+```
+
+**TODO 0c.** The class station model, unchanged: departures per start station, joined to stations.
+
+```{r}
+#| label: anchor-model
+trips    <- read_csv("trips_2025.csv")
+stations <- read_excel("stations.xlsx")
+
+clean <- trips |>
+  distinct() |>
+  filter(start_station_id != "S99",
+         is.na(end_station_id) | end_station_id != "S99") |>
+  mutate(
+    rider_type   = str_to_lower(str_trim(rider_type)),
+    duration_min = as.numeric(difftime(end_time, start_time, units = "mins"))
+  ) |>
+  filter(duration_min >= 1, duration_min <= 1440)
+
+class_station <- clean |>
+  count(start_station_id, name = "trips") |>
+  left_join(stations, by = c("start_station_id" = "station_id"))
+
+fit_class <- lm(trips ~ docks, data = class_station)
+tidy(fit_class) |> mutate(across(where(is.numeric), \(x) round(x, 2)))
+```
+
+The docks estimate reads **1545.71**, which matches the class value.
+
+**Q0d.** The Module 12 package with this property is **readxl**. "Ships with" means `install.packages("tidyverse")` downloads the package onto the machine. "Is attached" means `library()` has put its functions on the search path for the session. Since `library(tidyverse)` attaches only the core nine packages, `readxl` and `broom` need their own `library()` calls.
+
+## Part 1
+
+**TODO 1a.** I reused the Assignment 12 pipeline verbatim (the `anchor-model` above):
+
+```{r}
+#| label: clean-count
+nrow(clean)
+```
+
+**TODO 1b.** Arrivals per end station. Trips with no recorded end station are dropped before the join:
+
+```{r}
+#| label: build-per-station
+per_station <- clean |>
+  filter(!is.na(end_station_id)) |>
+  count(end_station_id, name = "arrivals") |>
+  left_join(stations, by = c("end_station_id" = "station_id")) |>
+  select(end_station_id, station_name, neighborhood, docks, year_installed, arrivals)
+
+nrow(per_station)
+sum(per_station$arrivals)
+```
+
+This gives 24 stations and 244,241 arrivals, which matches both anchors. The difference from 247,967 is exactly the 3,726 trips with no recorded end_station_id.
+
+**TODO 1c.** One row per calendar day:
+
+```{r}
+#| label: build-daily
+daily <- clean |>
+  group_by(date = as_date(start_time)) |>
+  summarise(
+    trips      = n(),
+    casual_pct = mean(rider_type == "casual") * 100
+  ) |>
+  mutate(post_july = date >= as_date("2025-07-01"))
+
+nrow(daily)
+```
+
+**Q1d.** In `per_station`, one row is one docking station and holds its 2025 arrivals, docks, neighborhood and installation year. It answers the question "which station gets the next twelve docks?". In `daily`, one row is one calendar day of 2025 and holds that day's total trips and casual share. It answers the price question "how far did casual ridership fall after July 1?".
+
+**Q1e.** With one row per day per rider type, the casual and member counts sit on separate rows. Neither row holds the day's share, so the model would treat 730 rows as independent observations of a mixed outcome rather than 365 days of one share. The day's denominator, the total trips the share is taken over, would be lost. They skipped step 2 of shaping the data so that one row is one unit of the question (here, one day) before fitting.
+
+## Part 2
+
+**TODO 2a.**
+
+```{r}
+#| label: fit-docks
+fit_docks <- lm(arrivals ~ docks, data = per_station)
+tidy(fit_docks, conf.int = TRUE)
+glance(fit_docks)
+range(per_station$docks)
+```
+
+**TODO 2b.** Each additional dock is associated with about 1,516 more arrivals per year (95% CI 1,241 to 1,791). This holds only across the 10 to 24 docks the network actually has.
+
+**TODO 2c.**
+
+```{r}
+#| label: predict-docks
+predict(fit_docks, newdata = tibble(docks = c(10, 16, 0)))
+```
+
+The model predicts about 4,492 arrivals at 10 docks, 13,587 at 16 docks, and −10,666 at 0 docks.
+
+**Q2d.** The `0-dock prediction` describes no real station. A station with no docks can't receive bikes, and a negative count of arrivals is impossible. The intercept is just where the fitted line crosses zero, far outside the observed 10 to 24 docks. It illustrates the slides' rule against extrapolation: a regression line is only valid over the range of the data it was fitted on.
+
+**Q2e.** R² = 0.856 and sigma = 2,763 arrivals. I would show her **sigma**. It is in her units and answers her question directly, for a given station the model is typically off by about 2,800 arrivals a year. R² only says the model explains 86% of the variation between stations, which doesn't tell her how far off a single prediction is.
+
+## Part 3
+
+**TODO 3a.**
+
+```{r}
+#| label: resid-docks
+resid_docks <- augment(fit_docks, data = per_station) |>
+  select(station_name, neighborhood, docks, arrivals, .fitted, .resid) |>
+  arrange(desc(.resid))
+
+resid_docks |> slice_head(n = 5)
+resid_docks |> slice_tail(n = 3)
+```
+
+**TODO 3b.** The Hill – Ayres Hall has the largest positive residual. It has 12 docks and 14,034 arrivals, against a fitted value of 7,524, so its residual is +6,510. It receives about 6,500 more bikes a year than a typical 12-dock Ride Knox station, nearly double what its dock count would predict.
+
+**TODO 3c.**
+
+```{r}
+#| label: resid-by-neighborhood
+augment(fit_docks, data = per_station) |>
+  group_by(neighborhood) |>
+  summarise(stations = n(), mean_resid = mean(.resid)) |>
+  arrange(desc(mean_resid)) |>
+  print(n = 12)
+```
+
+**TODO 3d.** Test the partial-year explanation: the first and last trip touching each 2025 station, as either start or end.
+
+```{r}
+#| label: test-partial-year
+new_2025 <- stations |> filter(year_installed == 2025)
+
+clean |>
+  pivot_longer(c(start_station_id, end_station_id), values_to = "station_id") |>
+  filter(station_id %in% new_2025$station_id) |>
+  left_join(stations, by = "station_id") |>
+  group_by(station_name) |>
+  summarise(first_trip = min(as_date(start_time)),
+            last_trip  = max(as_date(start_time)))
+```
+
+**The partial-year explanation does not survive** Bearden and Sequoyah Hills both have trips from 1 January to 31 December 2025, so each has a full year of data.
+
+**Q3e.** The Assignment 12 ranking was arrivals ÷ docks, and Cumberland Ave & 17th St topped it narrowly (1,174 vs 1,170 per dock). The residual measures how far a station sits above what *the network's* dock–arrival line predicts for its size. Because that line has a negative intercept, it expects proportionally less from small stations, so a busy 12-dock station like Ayres Hall stands out more than a busy 16-dock one. The residual answers what a station absorbs *relative to what its build-out should carry*, not its raw throughput per dock.
+
+**Q3f.** Bearden is the *newest* station in the network (`year_installed` = 2025). A station's first year is when riders are still discovering it and building it into their routines. Had I skipped 3d, I would have told the director Bearden's shortfall was a calendar artifact. I would have written off a real signal, a new station still building its ridership, as a data indicator.
+
+## Part 4
+
+**TODO 4a.**
+
+```{r}
+#| label: fit-two
+fit_two <- lm(arrivals ~ docks + year_installed, data = per_station)
+tidy(fit_two, conf.int = TRUE)
+```
+
+**TODO 4b.**
+
+```{r}
+#| label: compare-docks-coef
+tibble(
+  model          = c("fit_docks", "fit_two"),
+  docks_estimate = c(coef(fit_docks)[["docks"]], coef(fit_two)[["docks"]])
+) |>
+  mutate(change = docks_estimate - first(docks_estimate))
+```
+
+The docks coefficient *fell by about 448 arrivals per dock*, from 1,516 to 1,067, a drop of roughly 30%.
+
+**TODO 4c.**
+
+```{r}
+#| label: docks-vs-year
+cor(per_station$docks, per_station$year_installed)
+
+per_station |>
+  group_by(year_installed) |>
+  summarise(stations = n(), mean_docks = mean(docks))
+```
+
+Docks and installation year are strongly negatively correlated (r = −0.68). The 2022 stations average 17.8 docks, and the later years average 10 to 12. In `fit_docks`, docks was absorbing the effect of age where big stations are also old, central stations with years of established ridership. Once `year_installed` takes its own share, docks keeps only what it explains among stations of the same age.
+
+**TODO 4d.**
+
+```{r}
+#| label: coef-plot
+#| fig-width: 8
+#| fig-height: 3.5
+tidy(fit_two, conf.int = TRUE) |>
+  filter(term != "(Intercept)") |>
+  ggplot(aes(x = estimate, y = term)) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey50") +
+  geom_pointrange(aes(xmin = conf.low, xmax = conf.high), colour = "#0072B2") +
+  labs(
+    title    = "Docks add arrivals & each later install year subtracts them",
+    subtitle = "Coefficients from arrivals ~ docks + year_installed, with 95% intervals",
+    x = "Estimated change in annual arrivals (trips)", y = NULL
+  ) +
+  ops_theme
+```
+
+The intercept is about 5.8 million arrivals, an extrapolation to the year 0. Left in, it stretches the x-axis so far that both real coefficients collapse onto zero.
+
+**Q4e.** Holding docks fixed, each year later a station was installed is associated with about *2,876 fewer arrivals per year* (95% CI 1,834 to 3,918 fewer). This does not mean "install stations in earlier years" since age is not a lever anyone can pull. Year of installation also stands in for *where* stations went and it shows that the network grew from downtown and campus outward, so the coefficient mixes age with location.
+
+**Q4f.**
+
+```{r}
+#| label: glance-docks-two
+bind_rows(docks_only = glance(fit_docks), docks_year = glance(fit_two), .id = "model") |>
+  select(model, r.squared, adj.r.squared, sigma)
+```
+
+Adjusted R² rose from 0.849 to 0.939, and sigma fell from 2,763 to 1,764 arrivals. A predictor earns its place only if adjusted R² goes up, so *`year_installed` earns its place*. Plain R² couldn't show this, because plain R² never decreases when a predictor is added, even a useless one. Adjusted R² penalizes for the extra parameter.
+
+## Part 5
+
+**TODO 5a.**
+
+```{r}
+#| label: share-before-after
+daily |>
+  group_by(post_july) |>
+  summarise(days = n(), mean_casual_pct = mean(casual_pct))
+```
+
+**TODO 5b.**
+
+```{r}
+#| label: fit-share
+fit_share <- lm(casual_pct ~ post_july, data = daily)
+tidy(fit_share, conf.int = TRUE)
+glance(fit_share)
+```
+
+**TODO 5c.** After July 1, casual riders' share of daily trips was *16.4 percentage points lower* (95% CI 15.7 to 17.1 points lower), down from 43.8% to 27.4%.
+
+**Q5d.** R turned the logical into a 0/1, FALSE = 0 and TRUE = 1, which is why the coefficient is named `post_julyTRUE`. The intercept is the predicted share when `post_july` = 0. That is the *average casual share of daily trips from January through June: 43.8%*.
+
+**Q5e.** A share divides casual trips by all trips on the same day, so whatever lifts both groups equally cancels out, summer weather or semester calendars. That does the job class needed member counts for. However, a share is only seasonless if season moves casual and member riders in proportion. Casual riders don't ride on members' schedule, so the residuals still have to be checked.
+
+## Part 6
+
+**TODO 6a.**
+
+```{r}
+#| label: resid-share-date
+#| fig-width: 9
+#| fig-height: 4.5
+aug_share <- augment(fit_share, data = daily)
+
+ggplot(aug_share, aes(x = date, y = .resid)) +
+  geom_hline(yintercept = 0, colour = "grey40") +
+  geom_point(alpha = 0.5, colour = "#D55E00") +
+  labs(
+    title    = "Residuals are flat before July, then slide steadily downward",
+    subtitle = "Residuals from casual_pct ~ post_july, one point per day, 2025",
+    x = NULL, y = "Residual (percentage points)"
+  ) +
+  ops_theme
+```
+
+**TODO 6b.**
+
+```{r}
+#| label: resid-share-month
+aug_share |>
+  group_by(month = month(date, label = TRUE)) |>
+  summarise(mean_resid = mean(.resid)) |>
+  print(n = 12)
+```
+
+**TODO 6c.** From January to June the monthly means sit within about ±1 point of zero, so the pre-July level is well described by a constant. After July 1 they fall in a straight run; +6.4 in July, +3.0 in August, about 0 in September, then −1.8, −2.9 and −4.7 points. Class's naive count model showed a seasonal arc across the *whole* year, a weather pattern. This now shows a flat first half and a widening gap in the second. *The real effect is a slide, not a cliff.*: The share kept falling during fall, so the 16.4-point average understates the gap by December (about 21 points) and overstates it for July (about 10 points).
+
+**TODO 6d.**
+
+```{r}
+#| label: resid-share-fitted
+#| fig-width: 7
+#| fig-height: 4.5
+ggplot(aug_share, aes(x = .fitted, y = .resid)) +
+  geom_hline(yintercept = 0, colour = "grey40") +
+  geom_jitter(width = 0.15, alpha = 0.5, colour = "#0072B2") +
+  labs(
+    title    = "Post-July residuals spread twice as wide as pre-July",
+    subtitle = "Residuals vs fitted values, casual_pct ~ post_july",
+    x = "Fitted casual share (%)", y = "Residual (percentage points)"
+  ) +
+  ops_theme
+
+aug_share |>
+  group_by(post_july) |>
+  summarise(resid_sd = sd(.resid))
+```
+
+There are two strips because the model has a single TRUE/FALSE predictor. It can only produce two fitted values, 43.8 and 27.4. The post-July residual SD (4.12 points) is *about twice* the pre-July SD (2.11 points).
+
+**Q6e.** This is the *`E (equal variance)`* assumption which fails here since the spread doubles after July. For the finance director, the model is *not* equally trustworthy on both days. For instance, a March day lands within about ±2 points of its prediction, while an October day can miss by twice that. 
+
+**Q6f.** This violates *I (independence)*. The slides detect it with the *Durbin–Watson statistic*:
+
+```{r}
+#| label: durbin-watson
+e <- residuals(fit_share)
+sum(diff(e)^2) / sum(e^2)   # Durbin-Watson: ~2 means no autocorrelation
+```
+
+At 0.68, well below 2, a high-residual day tends to follow a high-residual day. The *estimate (−16.4) is not biased* by this in part 5. The *interval is too narrow* proving that correlated days carry less independent information than 365 separate draws, thus, the standard error is understated.
+
+**Q6g.** Alternative would be let the effect change over time, for example `lm(casual_pct ~ post_july * days_since_july1)` or `month` as a factor. Either uses the same `lm()` and `mutate()`. The step model still gets the *average* right. Its coefficient is exactly the mean post-July share minus the mean pre-July share which matches the honest half-year number a budget line needs, even if it hides the trajectory.
+
+## Part 7
+
+**TODO 7a.**
+
+```{r}
+#| label: add-weekend
+daily <- daily |>
+  mutate(is_weekend = wday(date, week_start = 1) >= 6)
+
+count(daily, is_weekend)
+```
+
+**TODO 7b.**
+
+```{r}
+#| label: fit-weekend
+fit_wknd <- lm(casual_pct ~ post_july + is_weekend, data = daily)
+tidy(fit_wknd, conf.int = TRUE)
+```
+
+**TODO 7c.**
+
+```{r}
+#| label: glance-share-weekend
+bind_rows(share = glance(fit_share), share_weekend = glance(fit_wknd), .id = "model") |>
+  select(model, r.squared, adj.r.squared, sigma, AIC)
+```
+
+**Q7d.** Plain R² rose from 0.862907 to 0.862908 while the Adjusted R² *fell* from 0.8625 to 0.8622, and AIC *rose* from 1907.4 to 1909.4. The weekend coefficient is −0.02 points (p = 0.97). *`is_weekend` earns nothing* since the rule states that plain R² can only go up when you add a predictor, so it can't judge one. A predictor earns its place only if adjusted R² rises and AIC falls, and here both moved the wrong way.
+
+**Q7e.** Across 2025, weekends and weekdays had the same casual share of trips. The difference is 0.02 points, effectively zero, so on mix alone weekends aren't a different business. My model only sees each day's overall share, which averages across every hour and every station, so it can't tell you whether weekend casual riders ride at different times, to different places, or for different reasons than weekday ones.
+
+## Part 8
+
+**TODO 8a.**
+
+```{r}
+#| label: build-round-trips
+rt_data <- clean |>
+  filter(!is.na(end_station_id)) |>
+  mutate(round_trip = end_station_id == start_station_id)
+
+nrow(rt_data)
+sum(rt_data$round_trip)
+mean(rt_data$round_trip) * 100
+```
+
+I kept 244,241 trips, which is 247,967 − 3,726 with no recorded end and matches the arrivals anchor. Of those, 30,112 are round trips, so the *base rate is 12.3%*.
+
+**TODO 8b.**
+
+```{r}
+#| label: round-trip-by-rider
+rt_data <- rt_data |>
+  mutate(
+    is_casual = rider_type == "casual",
+    evening   = hour(start_time) >= 16
+  )
+
+rt_data |>
+  group_by(is_casual) |>
+  summarise(trips = n(), round_trip_pct = mean(round_trip) * 100)
+```
+
+Casual trips come back to their start station 23.1% of the time and member trips 6.1% of the time.
+
+**TODO 8c.**
+
+```{r}
+#| label: fit-round-trip
+fit_rt <- glm(round_trip ~ is_casual + duration_min + evening,
+              family = binomial, data = rt_data)
+tidy(fit_rt)
+```
+
+**TODO 8d.**
+
+```{r}
+#| label: round-trip-odds
+tidy(fit_rt, exponentiate = TRUE, conf.int = TRUE)
+```
+
+Holding duration and time of day fixed, a casual trip has about *4.5 times the odds* of being a round trip compared with a member trip (95% CI 4.42 to 4.67).
+
+**TODO 8e.**
+
+```{r}
+#| label: round-trip-scenarios
+scenarios <- tibble(
+  is_casual    = c(TRUE, TRUE, FALSE, FALSE),
+  duration_min = c(10, 45, 10, 45),
+  evening      = FALSE
+)
+
+augment(fit_rt, newdata = scenarios, type.predict = "response")
+```
+
+*Rider type moves the answer* (about 23% casual vs 6% member). Going from 10 to 45 minutes moves it by less than half a point.
+
+**Q8f.** *`duration_min` and `evening`* earn nothing. Their odds ratios are 1.0007 (95% CI 0.9998 to 1.0017, p = 0.12) and 1.0018 (95% CI 0.976 to 1.028, p = 0.89). Both intervals straddle 1, and both are narrow. With 244,241 trips, the model had ample power to detect even a small effect which makes this a *precise zero*. This is a new finding whether a bike comes back depends on *who* rides it, not how long or when. Operations can plan rebalancing around the rider mix and stop worrying about trip length or time of day.
+
+**TODO 8g.**
+
+```{r}
+#| label: lpm-check
+fit_lpm <- lm(round_trip ~ is_casual + duration_min + evening, data = rt_data)
+
+range(fitted(fit_lpm))
+sum(fitted(fit_lpm) < 0 | fitted(fit_lpm) > 1)
+```
+
+*The slides' failure does not reproduce here.* The `lm()` fitted values run from 0.060 to 0.247, and *none* fall outside 0 to 1. Every predictor except rider type is near zero, and the 1- to 1440-minute filter keeps duration from dragging the line through the ceiling.
+
+**Q8h.** First, `lm()` *guarantees* nothing about staying between 0 and 1. It stayed inside here only solely based off this data. Adding a strong continuous predictor or scoring a 3-hour trip, nothing would stop it from predicting outside this zone. `glm()` with a logit link can't leave (0, 1) for any input. Second, `lm()` coefficient on a 0/1 outcome is a change in *probability* (percentage points), not a log-odds. It can't be called an odds ratio, and `exp()` of it is a meaningless number. With `glm()`, `exp(coef)` *is* the odds ratio from 8d.
+
+## Part 9
+
+**TODO 9a.**
+
+```{r}
+#| label: fitted-probs
+rt_scored <- rt_data |>
+  mutate(prob = predict(fit_rt, type = "response"))
+
+max(rt_scored$prob)
+```
+
+**TODO 9b.**
+
+```{r}
+#| label: classify-50
+rt_scored <- rt_scored |> mutate(pred_50 = prob >= 0.5)
+
+sum(rt_scored$pred_50)
+mean(rt_scored$pred_50 == rt_scored$round_trip)
+```
+
+**TODO 9c.**
+
+```{r}
+#| label: base-rate-not-rt
+tibble(
+  accuracy_at_0.5    = mean(rt_scored$pred_50 == rt_scored$round_trip),
+  base_rate_not_rt   = mean(!rt_scored$round_trip)
+)
+```
+
+**TODO 9d.**
+
+```{r}
+#| label: classify-20
+rt_scored |>
+  mutate(pred_20 = prob >= 0.20) |>
+  summarise(
+    accuracy  = mean(pred_20 == round_trip),
+    flagged   = sum(pred_20),
+    recall    = sum(pred_20 & round_trip) / sum(round_trip),
+    precision = sum(pred_20 & round_trip) / sum(pred_20)
+  )
+```
+
+At 0.20 the model flags 89,304 trips, which is exactly the number of casual trips. At this cutoff the classifier reduces to "is the rider casual?"
+
+**Q9e.** The highest predicted probability any trip gets is 0.252, below 0.5, so at the default cutoff the model *labels zero trips as round trips*. Its 87.7% accuracy is identical to the 87.7% base rate of 'not a round trip'. It scores high by answering *no* every time, which a model with no data at all could also do. It is worthless because it never finds a single round trip, and finding them is the whole operational question.
+
+**Q9f.** Accuracy dropped from 87.7% to 68.0%, yet the model now catches 68% of real round trips instead of none. That proves *accuracy rewards agreeing with the majority class and is a poor summary when classes are unbalanced*. Recall and precision say whether the model does the job. The cost for Ride-Knox is precision, so at only 23%, about *three of every four flagged trips are not round trips*. If operations skips rebalancing for flagged bikes, roughly 69,000 bikes a year would be left stranded at the wrong station.
+
+## Part 10
+
+**TODO 10a.** The `load-packages` chunk at the top now carries `#| include: false`. It still runs, since every later chunk calls tidyverse, readxl and broom functions and the document renders, but neither its code nor its output appears.
+
+**TODO 10b.** Every chunk in this document carries an explicit `#| label:` value, for example `fit-docks`, `test-partial-year`, `resid-share-month`, `lpm-check` and `classify-20`.
+
+**TODO 10c.**
+
+```{r}
+#| label: share-effect-numbers
+share_effect <- tidy(fit_share, conf.int = TRUE) |>
+  filter(term == "post_julyTRUE")
+share_effect
+```
+
+The sentence, as rendered:
+
+> After July 1, the casual share of daily trips changed by `r pp(share_effect$estimate)` percentage points (95% CI `r pp(share_effect$conf.low)` to `r pp(share_effect$conf.high)`).
+
+Its source:
+
+````markdown
+After July 1, the casual share of daily trips changed by `r knitr::inline_expr("pp(share_effect$estimate)")` percentage points (95% CI `r knitr::inline_expr("pp(share_effect$conf.low)")` to `r knitr::inline_expr("pp(share_effect$conf.high)")`).
+````
+
+**TODO 10d.**
+
+```{r}
+#| label: daily-share-figure
+#| fig-cap: "Casual share of daily trips, 2025. Orange line: the fitted step from casual_pct ~ post_july. Dashed line: July 1 price increase."
+#| fig-width: 9
+#| fig-height: 4.5
+ggplot(aug_share, aes(x = date)) +
+  geom_point(aes(y = casual_pct), alpha = 0.4, colour = "grey30") +
+  geom_line(aes(y = .fitted), colour = "#D55E00", linewidth = 1) +
+  geom_vline(xintercept = as_date("2025-07-01"), linetype = "dashed", colour = "grey40") +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(
+    title    = "Casual share stepped down 16 points in July, then kept sliding",
+    subtitle = "Ride Knox casual share of daily trips, 2025 (n = 365 days)",
+    x = NULL, y = "Casual share of daily trips (%)"
+  ) +
+  ops_theme
+```
+
+**Q10e.** Inline code makes it impossible for the prose and the model to disagree. Every digit in the 10c sentence is recomputed from `fit_share` on each render, so if the data, the cleaning or the model change, the sentence changes with them. That is the director's complaint about a headline number that didn't match the spreadsheet it came from; there is no copying step where a number could go stale.
+
+**Q10f.** `echo: false` hides the *code* but still runs it and *shows the output* (printed results and figures). `include: false` hides *both code and output*, but the chunk *still runs*, so its objects exist for later chunks. In this document, `load-packages` is right for `include: false`: a reader needs no proof that packages loaded. A memo figure for the director would suit `echo: false`: she needs the chart, not the ggplot code.
+
+## Part 11
+
+```{r}
+#| label: memo-numbers
+#| include: false
+pre_share   <- coef(fit_share)[["(Intercept)"]]
+post_share  <- pre_share + share_effect$estimate
+dw_stat     <- sum(diff(e)^2) / sum(e^2)
+
+resid_month <- aug_share |>
+  group_by(month = month(date, label = TRUE)) |>
+  summarise(mean_resid = mean(.resid))
+resid_jul <- resid_month$mean_resid[resid_month$month == "Jul"]
+resid_dec <- resid_month$mean_resid[resid_month$month == "Dec"]
+
+resid_sd <- aug_share |> group_by(post_july) |> summarise(s = sd(.resid))
+sd_pre   <- resid_sd$s[!resid_sd$post_july]
+sd_post  <- resid_sd$s[resid_sd$post_july]
+
+top_station <- augment(fit_two, data = per_station) |>
+  slice_max(.resid, n = 1)
+no_end <- nrow(clean) - nrow(rt_data)
+```
+
+### Memo: Rolling back the July price increase
+
+**To:** Finance Director  **From:** Charles Munga Muiruri  **Re:** July price effect and the next twelve docks
+
+**Bottom line.** Casual riders' share of daily trips fell by `r pp(-share_effect$estimate)` percentage points after July 1 (95% CI `r pp(-share_effect$conf.high)` to `r pp(-share_effect$conf.low)`), from `r pp(pre_share)`% to `r pp(post_share)`%.
+
+**Evidence.** A model of all 365 daily shares puts the July change at that figure. For the grant, a model of arrivals on docks and installation year names *`r top_station$station_name`* as the most underbuilt station. It absorbs `r num(top_station$.resid)` more arrivals a year than its `r top_station$docks` docks and age predict, and leads the network in arrivals per dock.
+
+**Interpretation (this is interpretation, not measurement).** The size and timing of the drop are consistent with the price increase driving casual riders away. Nothing in this data rules out another cause that also began in July.
+
+**Limitations.**
+
+1. The drop is a slide, not a step. Errors run from +`r pp(resid_jul)` points in July to `r pp(resid_dec)` in December, so the year-end gap exceeds the average.
+2. Consecutive days are correlated (Durbin–Watson `r num(dw_stat, 2)`), so the true interval is wider than stated. The estimate itself is unaffected.
+3. Post-July days scatter twice as widely (SD `r pp(sd_post)` vs `r pp(sd_pre)` points), so fall predictions are less reliable.
+4. I excluded the `r num(no_end)` trips with no recorded end station from the station and round-trip models. If they cluster at particular stations, the ranking could shift.
+5. One year, one city, no comparison group and this is a before-and-after comparison, not an experiment.
+
+**Recommendation.** Award the twelve docks to `r top_station$station_name`. On pricing, measure first: restore the old casual price at a random half of stations for eight weeks from January, and take the full rollback to the board only if their casual share recovers against the other half.
+
+### 11c. Commit
+
+The rendered output is ignored, not committed. `.gitignore` now lists:
+
+```
+price_effect.html
+price_effect_files/
+```
+
+`git status` after committing `price_effect.qmd`:
+
+```
+PASTE git status OUTPUT HERE
+```
+
+**Commit URL:** PASTE COMMIT URL HERE
+
+**Q11d.** The `.qmd` is the single source of truth, and the HTML can be regenerated from it on any machine at any time. Committing the rendered file only adds a second copy that can fall out of step with its source, which is the mismatch the director complained about. I would commit the rendered file anyway when it is the published product itself, for example a report served to readers straight from the repository through GitHub Pages, where readers cannot render the `.qmd` themselves.
+
+## Reflection
+
+**R1.** Both obvious explanations failed. In 3d the partial-year story was false: Bearden and Sequoyah Hills both have trips from 1 January to 31 December. In 8g the slides' failure didn't reproduce: `lm()` stayed between 0.060 and 0.247. The habit I'll build: every "because" sentence in my prose gets a chunk labelled `check-…` directly above it, and that chunk runs the one line that could prove the sentence wrong. For any claim about stations or time, that line is `summarise(first = min(date), last = max(date), n = n())` by group. For any model, it is `range(fitted(fit))`. If the check chunk doesn't exist, the sentence doesn't get written.
+
+**R2.** The one I'd have been least likely to catch is the Part 6 residual pattern. An R² of 0.86 and a p-value of 10⁻¹⁵⁸ felt finished, and the step model gave a clean answer to exactly the question asked. Only the monthly residual means showed that the effect was still growing in December. The habit I would embrace is straight after every `lm()`, I'd run the same two lines before I interpret a single coefficient. One is `augment(fit, data = df) |> ggplot(aes(<time or order>, .resid)) + geom_point()`; the other is `augment(fit, data = df) |> group_by(<month or group>) |> summarise(mean(.resid))`. If either shows structure, the coefficients wait.
+
+**R3.** Log rendered through Quarto can be considered clean, reproducible work that is least prone to error if we compared it to copy and paste actions from previous model. However, the render is only as correct as the code chunks inside the .qmd. It is not a direct method of generating the log especially when the specifications are not correctly set inside the .qmd. This is not the case for the direct copy and paste method. For a report that only I would read, I would still use Quarto, just because it is connected to my .qmd which contains the code chunks I can change and regenerate without having to check and delete if a copy and paste method is used.
+
+**R4.** My model establishes how much the casual share fell after July 1 and how precisely I know that. It cannot establish *why* since it is a before-and-after comparison, so anything else that began in July is mixed into the 16.4 points (the fall semester bringing students back as members, weather, or a competing scooter service). It also can't tell whether casual riders left or simply became members. To close the gap Ride Knox would need three things. First, 2024 trips for the same months, to see whether the share always falls in fall period. Second, a rider ID that links a casual account to a later membership. Third, a randomised price test across stations, as the memo recommends, so that some riders face the old price at the same time as others face the new one.
+
+## AI Disclosure
+AI use in this work involved correcting for syntax within code chunks and reviewing the pipe logic especially in creating the models and their parameters. Additionally, tools such as VS code copilot and Claude CLI were useful in elaborating key logic functions and how they related with the class slides under this module. The codes contained herein, the Git actions, and final analysis are my own. 
+
