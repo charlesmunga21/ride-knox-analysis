@@ -33,3 +33,7 @@ trips_2026_07.csv
 .Rproj.user/
 Rplots.pdf
 /figs/
+
+# Assignment 13: rendered Quarto output, regenerated from price_effect.qmd
+price_effect.html
+price_effect_files/
